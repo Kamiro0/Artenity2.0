@@ -36,7 +36,7 @@
   top: -75px;
   left: 90%;
   transform: translateX(-50%);
-  color: white;
+  color: rgb(255, 255, 255);
   font-size: 35px;
   font-weight: bold;
   font-family: 'Adlery', cursive;
@@ -170,15 +170,15 @@ input[type="email"] {
 }
 
 .brush.top-left {
-  top: 50px;
-  left: -60px;
-  transform: rotate(-30deg);
+  top: 125px;
+  left: -150px;
+  transform: rotate(-40deg);
 }
 
 .brush.bottom-right {
-  bottom: 200px;
+  bottom: 100px;
   right: -15px;
-  transform: rotate(-30deg);
+  transform: rotate(-50deg);
 }
 
 @media (max-width: 480px) {
@@ -202,4 +202,34 @@ input[type="email"] {
 .registro-container .campo-genero,
 .registro-container .cuenta {
   font-family: 'KitOne', sans-serif;
+}
+
+input[type="date"] {
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  padding: 8px 12px;
+  border: 2px solid #000000;   /* borde morado */
+  border-radius: 8px;
+  background-color: #610485;
+  color: #333;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+input[type="date"]:focus {
+  border-color: #ab47bc;       /* cambia color al enfocar */
+  box-shadow: 0 0 6px rgba(171, 71, 188, 0.6);
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  background-color: #ab47bc;   /* icono de calendario */
+  padding: 4px;
+  border-radius: 50%;
+  cursor: pointer;
+  filter: invert(1);           /* invierte color del icono */
+}
+
+input[type="date"]::-webkit-inner-spin-button,
+input[type="date"]::-webkit-clear-button {
+  display: none;                /* oculta botones de spin y clear */
 }
