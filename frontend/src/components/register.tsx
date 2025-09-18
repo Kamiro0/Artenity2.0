@@ -7,7 +7,6 @@ import { registerUsuario } from "../services/api";
 import brushImg from "../assets/img/loginmusic.png";
 import logoImg from "../assets/img/logo.png";
 
-  
 const Register: React.FC = () => {
   const navigate = useNavigate();
   const [form, setForm] = useState({
@@ -17,6 +16,7 @@ const Register: React.FC = () => {
     contrasena: "",
     fecha_nacimiento: "",
     genero: "",
+    especifique_genero: "",
     tipo_arte_preferido: "",
     telefono: "",
     nombre_usuario: "",
@@ -40,11 +40,11 @@ const Register: React.FC = () => {
         contrasena: "",
         fecha_nacimiento: "",
         genero: "",
+        especifique_genero: "",
         tipo_arte_preferido: "",
         telefono: "",
         nombre_usuario: "",
       });
-
       navigate("/login");
     } catch (error: any) {
       setMensaje(error.message || "Error al registrar usuario");
@@ -126,18 +126,17 @@ const Register: React.FC = () => {
               />{" "}
               Personalizado
             </label>
-
-          </div >
-         <input
+          </div>
+          <input
             type="text"
             name="especifique_genero"
             placeholder=" Especifique su género"
-            value={form.genero} 
+            value={form.especifique_genero}
             onChange={handleChange}
-            required
+            required={form.genero === "Personalizado"}
+            style={{ display: form.genero === "Personalizado" ? "block" : "none" }}
           />
-            
-          
+
           <input
             type="text"
             name="correo_electronico"
