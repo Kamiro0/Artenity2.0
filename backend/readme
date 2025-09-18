@@ -1,0 +1,6 @@
+# Se creo la conexion a la base de datos para el registro 
+# con FastAPI 
+# iniciar instalar dependecias descargar y poner a funcionar la bd de nombre artenity en xamp
+# se crearon las carpetas database.py, main.py, models.py, schemas.py
+# iniciar backend FastAPI antes de iniciar el frotend (uvicorn backend.main:app --reload) 
+# iniciar frontend con npm start
