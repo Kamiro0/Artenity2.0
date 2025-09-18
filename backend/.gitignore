@@ -29,3 +29,5 @@ yarn-error.log*
 
 # Sistema operativo
 Thumbs.db
+__pycache__/
+*.pyc

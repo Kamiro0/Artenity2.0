@@ -61,6 +61,7 @@ body {
 
   transition: transform 0.3s, background 0.3s;
 }
+
 .bannor-button {
   position: absolute;
   bottom: 120px; 
