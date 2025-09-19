@@ -42,6 +42,16 @@ def delete_usuario(usuario_id: int, db: Session = Depends(get_db)):
     db.commit()
     return usuario
 
+@app.post("/login")
+def login(data: dict, db: Session = Depends(get_db)):
+    # Puedes cambiar 'correo_electronico' por 'nombre_usuario' si lo prefieres
+    correo = data.get("correo_electronico")
+    contrasena = data.get("contrasena")
+    usuario = db.query(models.Usuario).filter(models.Usuario.correo_electronico == correo).first()
+    if not usuario or usuario.contrasena != contrasena:
+        raise HTTPException(status_code=400, detail="Credenciales incorrectas")
+    # Aquí deberías devolver un token, pero para pruebas puedes devolver un mensaje simple
+    return {"token": "fake-token", "usuario": usuario.nombre_usuario}
 # ------------------ CORS ------------------
 app.add_middleware(
     CORSMiddleware,

@@ -1,7 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import "../styles/login.css";
-import { Link } from "react-router-dom";
-// Importa las imágenes desde /assets o la ruta que uses
+import { Link, useNavigate } from "react-router-dom";
 import brushImg from "../assets/img/loginmusic.png";
 import logoImg from "../assets/img/logo.png";
 import googleImg from "../assets/img/google.png";
@@ -9,8 +8,27 @@ import facebookImg from "../assets/img/facebook.png";
 import appleImg from "../assets/img/apple.png";
 import discordImg from "../assets/img/discord.png";
 import instagramImg from "../assets/img/instagram.png";
+import { loginUsuario } from "../services/api"; // Asegúrate de tener esta función en tu API
 
 const Login: React.FC = () => {
+  const [name, setName] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+         const res = await loginUsuario(name, password);
+      if (res.token) {
+        localStorage.setItem("token", res.token); // guarda token
+        navigate("/principal"); // redirige a página principal
+      }
+    } catch (error) {
+      alert("❌ Credenciales incorrectas o error de conexión");
+    }
+  };
+
   return (
     <div>
       {/* Pinceladas */}
@@ -19,18 +37,28 @@ const Login: React.FC = () => {
 
       {/* Contenedor Login */}
       <div className="login-container">
-        <form>
+        <form onSubmit={handleSubmit}>
           <div className="input-group">
             <label htmlFor="name">NAME</label>
             <input
               type="text"
               id="name"
               placeholder="CORREO ELECTRONICO O NUMERO DE TELEFONO"
+              value={name}
+              onChange={(e) => setName(e.target.value)} // 👈 guarda en state
+              required
             />
           </div>
           <div className="input-group">
             <label htmlFor="password">PASSWORD</label>
-            <input type="password" id="password" placeholder="CONTRASEÑA" />
+            <input
+              type="password"
+              id="password"
+              placeholder="CONTRASEÑA"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)} // 👈 guarda en state
+              required
+            />
           </div>
           <button type="submit" className="login-btn">
             Iniciar Sesión!!
@@ -51,7 +79,7 @@ const Login: React.FC = () => {
         </div>
 
         <p className="register">
-          ¿No tienes una cuenta? <Link to="/Register">Regístrate</Link>
+          ¿No tienes una cuenta? <Link to="/register">Regístrate</Link>
           <br />
           <a href="/#">Olvidé mi contraseña</a>
         </p>
