@@ -8,21 +8,21 @@ import facebookImg from "../assets/img/facebook.png";
 import appleImg from "../assets/img/apple.png";
 import discordImg from "../assets/img/discord.png";
 import instagramImg from "../assets/img/instagram.png";
-import { loginUsuario } from "../services/api"; // Asegúrate de tener esta función en tu API
+import { loginUsuario } from "../services/api";
 
 const Login: React.FC = () => {
-  const [name, setName] = useState("");
-  const [password, setPassword] = useState("");
+  const [correo_electronico, setCorreo] = useState("");
+  const [contrasena, setContrasena] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-         const res = await loginUsuario(name, password);
+      const res = await loginUsuario(correo_electronico, contrasena);
       if (res.token) {
-        localStorage.setItem("token", res.token); // guarda token
-        navigate("/principal"); // redirige a página principal
+        localStorage.setItem("token", res.token);
+        navigate("/principal");
       }
     } catch (error) {
       alert("❌ Credenciales incorrectas o error de conexión");
@@ -39,24 +39,24 @@ const Login: React.FC = () => {
       <div className="login-container">
         <form onSubmit={handleSubmit}>
           <div className="input-group">
-            <label htmlFor="name">NAME</label>
+            <label htmlFor="correo">CORREO ELECTRÓNICO</label>
             <input
-              type="text"
-              id="name"
-              placeholder="CORREO ELECTRONICO O NUMERO DE TELEFONO"
-              value={name}
-              onChange={(e) => setName(e.target.value)} // 👈 guarda en state
+              type="email"
+              id="correo"
+              placeholder="CORREO ELECTRÓNICO"
+              value={correo_electronico}
+              onChange={(e) => setCorreo(e.target.value)}
               required
             />
           </div>
           <div className="input-group">
-            <label htmlFor="password">PASSWORD</label>
+            <label htmlFor="contrasena">CONTRASEÑA</label>
             <input
               type="password"
-              id="password"
+              id="contrasena"
               placeholder="CONTRASEÑA"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)} // 👈 guarda en state
+              value={contrasena}
+              onChange={(e) => setContrasena(e.target.value)}
               required
             />
           </div>

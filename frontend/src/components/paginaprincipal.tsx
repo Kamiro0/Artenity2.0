@@ -1,8 +1,10 @@
 import { Home, Compass, Grid, MessageSquare, Settings, Image } from "lucide-react";
+import "../styles/paginaprincipal.css";
+import defaultProfile from "../assets/img/fotoperfildefault.jpg";
 
 export default function PaginaPrincipal() {
   return (
-    <div className="flex h-screen bg-[url('https://i.ibb.co/NyRbd8m/bg-art.jpg')] bg-cover bg-center text-white">
+    <div className="flex h-screen text-white">
       {/* Sidebar */}
       <aside className="w-64 bg-black/50 flex flex-col justify-between py-6 px-4">
         <div className="space-y-6">
@@ -45,7 +47,9 @@ export default function PaginaPrincipal() {
           <div className="flex items-center gap-3">
             <input type="text" placeholder="Buscar" className="flex-1 px-4 py-2 rounded-xl bg-black/80 focus:outline-none"/>
             <button className="bg-gradient-to-r from-purple-700 to-pink-500 px-3 py-2 rounded-xl">🔔</button>
-            <div className="w-10 h-10 rounded-full bg-purple-500"></div>
+            <div className="w-10 h-10 rounded-full bg-purple-500 overflow-hidden">
+              <img src={defaultProfile} alt="Perfil" className="w-full h-full object-cover" />
+            </div>
           </div>
 
           {/* Comunidades */}

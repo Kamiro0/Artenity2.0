@@ -13,14 +13,20 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Mantengo tu ruta inicial hacia Artenity */}
+        {/* Ruta inicial hacia Artenity */}
         <Route path="/" element={<Artenity />} />
 
-        {/* Login y registro como ya lo tenías */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        {/* Si ya está autenticado, redirige login y register a principal */}
+        <Route
+          path="/login"
+          element={isAuthenticated() ? <Navigate to="/principal" /> : <Login />}
+        />
+        <Route
+          path="/register"
+          element={isAuthenticated() ? <Navigate to="/principal" /> : <Register />}
+        />
 
-        {/* Nueva ruta protegida para la página principal */}
+        {/* Ruta protegida para la página principal */}
         <Route
           path="/principal"
           element={isAuthenticated() ? <PaginaPrincipal /> : <Navigate to="/login" />}
