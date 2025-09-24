@@ -1,4 +1,11 @@
+
 import axios from "axios";
+
+export async function getCategorias(): Promise<any> {
+  const res = await fetch("http://localhost:8000/categorias");
+  if (!res.ok) throw new Error("Error al obtener categorías");
+  return res.json();
+}
 
 
 const API_URL = "http://localhost:8000"; 
@@ -42,7 +49,7 @@ export async function deleteUsuario(id: number): Promise<any> {
 
 export async function registerUsuario(usuario: any): Promise<any> {
   try {
-    const res = await api.post("/register", usuario);
+    const res = await api.post("/usuarios", usuario);
     return res.data;
   } catch (error: any) {
     console.error("❌ Error al registrar usuario:", error.message);

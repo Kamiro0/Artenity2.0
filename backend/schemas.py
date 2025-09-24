@@ -16,5 +16,5 @@ class UsuarioCreate(UsuarioBase):
     pass
 
 class UsuarioResponse(UsuarioBase):
-    id: int  # Cambia a 'id'
+    id_usuario: int
     model_config = ConfigDict(from_attributes=True)

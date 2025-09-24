@@ -1,0 +1,80 @@
+.categorias-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  background: url("/assets/img/fondo-pintura.jpg") no-repeat center center;
+  background-size: cover;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+.busqueda {
+  flex: 1;
+  margin-right: 20px;
+}
+
+.input-busqueda {
+  width: 100%;
+  padding: 12px;
+  font-size: 14px;
+  border-radius: 20px;
+  border: none;
+  outline: none;
+  text-align: center;
+  background-color: #000;
+  color: #fff;
+}
+
+.categorias-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 220px);
+  gap: 20px;
+  flex: 3;
+}
+
+.categoria-card {
+  border-radius: 15px;
+  overflow: hidden;
+  color: white;
+  text-align: center;
+  font-family: "Poppins", sans-serif;
+  font-weight: bold;
+}
+
+.categoria-card h3 {
+  margin: 0;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+/* Colores diferentes por categoría */
+.categoria-card.pintura { background: linear-gradient(45deg, #9ee7f7, #5b7aff); }
+.categoria-card.danza { background: linear-gradient(45deg, #ff0099, #ff5f6d); }
+.categoria-card.musica { background: linear-gradient(45deg, #7b2ff7, #f107a3); }
+.categoria-card.cine { background: linear-gradient(45deg, #ff4b2b, #ff416c); }
+.categoria-card.literatura { background: linear-gradient(45deg, #f7971e, #ffd200); }
+
+.categoria-card img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 15px;
+}
+
+.barra-lateral {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.barra-lateral button {
+  background: #001f54;
+  border: none;
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+}

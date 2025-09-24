@@ -3,7 +3,7 @@ from .database import Base
 
 class Usuario(Base):
     __tablename__ = "usuarios"
-    id = Column(Integer, primary_key=True, index=True)  # Cambia a 'id'
+    id_usuario = Column(Integer, primary_key=True, index=True)
     nombre = Column(String)
     apellido = Column(String)
     correo_electronico = Column(String, unique=True, index=True)

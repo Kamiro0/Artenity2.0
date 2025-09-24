@@ -22,7 +22,7 @@ const Login: React.FC = () => {
       const res = await loginUsuario(correo_electronico, contrasena);
       if (res.token) {
         localStorage.setItem("token", res.token);
-        navigate("/principal");
+        setTimeout(() => navigate("/principal"), 100);
       }
     } catch (error) {
       alert("❌ Credenciales incorrectas o error de conexión");

@@ -1175,7 +1175,7 @@ CREATE TABLE `solicitudes_amistad` (
 --
 
 CREATE TABLE `usuarios` (
-  `id_usuario` int(11) NOT NULL,
+  `id_usuario` int(11) NOT NULL AUTO_INCREMENT,
   `nombre` varchar(100) NOT NULL,
   `apellido` varchar(100) NOT NULL,
   `correo_electronico` varchar(100) NOT NULL,
@@ -1184,9 +1184,9 @@ CREATE TABLE `usuarios` (
   `genero` varchar(20) DEFAULT NULL,
   `tipo_arte_preferido` varchar(100) DEFAULT NULL,
   `telefono` varchar(50) NOT NULL,
-  `nombre_usuario` varchar(100) DEFAULT NULL
+  `nombre_usuario` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`id_usuario`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
 --
 -- Volcado de datos para la tabla `usuarios`
 --
