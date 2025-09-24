@@ -3,14 +3,13 @@ from .database import Base
 
 class Usuario(Base):
     __tablename__ = "usuarios"
-
-    id_usuario = Column(Integer, primary_key=True, index=True)
-    nombre = Column(String(100), nullable=False)
-    apellido = Column(String(100), nullable=False)
-    correo_electronico = Column(String(100), unique=True, nullable=False)
-    contrasena = Column(String(100), nullable=False)
-    fecha_nacimiento = Column(Date, nullable=False)
-    genero = Column(String(50), nullable=False)
-    tipo_arte_preferido = Column(String(100), nullable=False)
-    telefono = Column(String(20), nullable=False)
-    nombre_usuario = Column(String(100), unique=True, nullable=False)
+    id = Column(Integer, primary_key=True, index=True)  # Cambia a 'id'
+    nombre = Column(String)
+    apellido = Column(String)
+    correo_electronico = Column(String, unique=True, index=True)
+    contrasena = Column(String)
+    fecha_nacimiento = Column(Date)
+    genero = Column(String)
+    tipo_arte_preferido = Column(String)
+    telefono = Column(String)
+    nombre_usuario = Column(String)

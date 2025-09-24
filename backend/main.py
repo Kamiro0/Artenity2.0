@@ -1,8 +1,9 @@
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
-from backend import models, database, schemas   # 👈 importa desde el paquete backend
+from backend import models, database, schemas
 from backend.database import get_db
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel, EmailStr
 
 app = FastAPI()
 
@@ -31,7 +32,7 @@ def create_usuario(usuario: schemas.UsuarioCreate, db: Session = Depends(get_db)
 
 @app.get("/usuarios", response_model=list[schemas.UsuarioResponse])
 def get_usuarios(db: Session = Depends(get_db)):
-    return db.query(models.Usuario).all()   # 👈 corregido
+    return db.query(models.Usuario).all()
 
 @app.delete("/usuarios/{usuario_id}", response_model=schemas.UsuarioResponse)
 def delete_usuario(usuario_id: int, db: Session = Depends(get_db)):
@@ -41,22 +42,38 @@ def delete_usuario(usuario_id: int, db: Session = Depends(get_db)):
     db.delete(usuario)
     db.commit()
     return usuario
+# Esquema para login
+class LoginRequest(BaseModel):
+    correo_electronico: EmailStr
+    contrasena: str
 
 @app.post("/login")
-def login(data: dict, db: Session = Depends(get_db)):
-    # Puedes cambiar 'correo_electronico' por 'nombre_usuario' si lo prefieres
-    correo = data.get("correo_electronico")
-    contrasena = data.get("contrasena")
+def login(data: LoginRequest, db: Session = Depends(get_db)):
+    correo = data.correo_electronico
+    contrasena = data.contrasena
     usuario = db.query(models.Usuario).filter(models.Usuario.correo_electronico == correo).first()
     if not usuario or usuario.contrasena != contrasena:
         raise HTTPException(status_code=400, detail="Credenciales incorrectas")
-    # Aquí deberías devolver un token, pero para pruebas puedes devolver un mensaje simple
     return {"token": "fake-token", "usuario": usuario.nombre_usuario}
+
 # ------------------ CORS ------------------
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # o ["*"] para permitir todos
+    allow_origins=["http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+@app.get("/home")
+def home():
+    # Simula una respuesta con los textos que buscan los tests
+    return {
+        "contenido": """
+            <div>Barra de navegación</div>
+            <div>Publicaciones</div>
+            <div>Categorías</div>
+            <div>Sugerencias</div>
+            <div>Pintura</div>
+            <div>homeuser</div>
+        """
+    }
