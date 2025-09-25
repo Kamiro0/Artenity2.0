@@ -20,9 +20,16 @@ const Login: React.FC = () => {
 
     try {
       const res = await loginUsuario(correo_electronico, contrasena);
-      if (res.token) {
+
+      console.log("Respuesta del backend:", res); // 🔍 Para depurar
+
+      if (res && res.token) {
         localStorage.setItem("token", res.token);
-        setTimeout(() => navigate("/principal"), 100);
+
+        // 🔥 Redirige directo a tu PaginaPrincipal
+        navigate("/paginaprincipal");
+      } else {
+        alert("❌ No se recibió token válido. Verifica el backend.");
       }
     } catch (error) {
       alert("❌ Credenciales incorrectas o error de conexión");
@@ -42,7 +49,7 @@ const Login: React.FC = () => {
             <label htmlFor="correo">CORREO ELECTRÓNICO</label>
             <input
               type="email"
-              id="correo"
+              name="correo_electronico"
               placeholder="CORREO ELECTRÓNICO"
               value={correo_electronico}
               onChange={(e) => setCorreo(e.target.value)}
@@ -53,7 +60,7 @@ const Login: React.FC = () => {
             <label htmlFor="contrasena">CONTRASEÑA</label>
             <input
               type="password"
-              id="contrasena"
+              name="contrasena"  
               placeholder="CONTRASEÑA"
               value={contrasena}
               onChange={(e) => setContrasena(e.target.value)}

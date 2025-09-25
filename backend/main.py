@@ -4,6 +4,7 @@ from backend import models, database, schemas
 from backend.database import get_db
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, EmailStr
+from typing import List
 
 app = FastAPI()
 
@@ -29,20 +30,21 @@ def create_usuario(usuario: schemas.UsuarioCreate, db: Session = Depends(get_db)
     db.commit()
     db.refresh(nuevo_usuario)
     return nuevo_usuario
-
-@app.get("/usuarios", response_model=list[schemas.UsuarioResponse])
+# En tu endpoint de /usuarios
+@app.get("/usuarios", response_model=List[schemas.UsuarioResponse])
 def get_usuarios(db: Session = Depends(get_db)):
-    return db.query(models.Usuario).all()
-
+    usuarios = db.query(models.Usuario).all()
+    # Filtra usuarios con correo válido
+    usuarios_validos = [u for u in usuarios if "@" in u.correo_electronico]
+    return usuarios_validos
 @app.delete("/usuarios/{usuario_id}", response_model=schemas.UsuarioResponse)
 def delete_usuario(usuario_id: int, db: Session = Depends(get_db)):
-    usuario = db.query(models.Usuario).filter(models.Usuario.id == usuario_id).first()
+    usuario = db.query(models.Usuario).filter(models.Usuario.id_usuario == usuario_id).first()
     if not usuario:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
     db.delete(usuario)
     db.commit()
     return usuario
-# Esquema para login
 class LoginRequest(BaseModel):
     correo_electronico: EmailStr
     contrasena: str
