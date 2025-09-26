@@ -10,9 +10,28 @@ export default function PaginaPrincipal() {
       document.body.classList.remove("pagina-principal");
     };
   }, []);
+
   return (
     <div className="main-container">
-      {/* Sidebar */}
+      {/* 🔹 Barra superior */}
+      <div className="topbar">
+        <input type="text" placeholder="Buscar" className="search-input" />
+        <button className="icon-btn">🔔</button>
+        <button className="img-btn">
+          <img src={defaultProfile} alt="Perfil" />
+        </button>
+        <button
+          className="icon-btn"
+          onClick={() => {
+            localStorage.removeItem("token");
+            window.location.href = "/login";
+          }}
+        >
+          ⏻
+        </button>
+      </div>
+
+      {/* Sidebar izquierda */}
       <aside className="sidebar">
         <div>
           <div className="text-center text-2xl font-bold mb-8">🎨 Artenity</div>
@@ -44,31 +63,31 @@ export default function PaginaPrincipal() {
           <button>SEGUIR</button>
           <button>GUARDADO</button>
         </div>
+
         <div className="post-input">
           <input type="text" placeholder="¿QUÉ QUIERES ESCRIBIR?" />
           <button>POST</button>
         </div>
+
+        {/* 🔹 Banner ahora dentro de la sección central */}
         <div className="banner">NUEVOS POSTERS!!</div>
+
         {/* Aquí puedes renderizar los posts reales */}
       </section>
 
       {/* Sidebar derecha */}
       <aside className="right-sidebar">
-        <input type="text" placeholder="Buscar" />
         <div className="card">
           <h2>COMUNIDADES A SEGUIR</h2>
-          <div className="user"><span>COMUNIDAD.NAME</span></div>
-          <div className="user"><span>COMUNIDAD.NAME</span></div>
+
         </div>
         <div className="card">
           <h2>LO QUE SUCEDE CON EL MUNDO DEL ARTE</h2>
-          <div className="user"><span>@USER.NAME</span></div>
-          <div>Sistemas nuevos para dibujo</div>
+
         </div>
         <div className="card">
           <h2>A QUIÉN SEGUIR</h2>
-          <div className="user"><span>USER.NAME</span><button className="follow-btn">+</button></div>
-          <div className="user"><span>USER.NAME</span><button className="follow-btn">+</button></div>
+
         </div>
       </aside>
     </div>
