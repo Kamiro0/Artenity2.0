@@ -3,7 +3,7 @@ import Artenity from './components/artenity';
 import Login from './components/login';
 import Register from './components/register';
 import PaginaPrincipal from './components/paginaprincipal';
-import Perfil from "./components/perfil";
+import Perfil from "./components/perfiles";
 import Busqueda from "./components/busqueda";
 
 const isAuthenticated = () => {

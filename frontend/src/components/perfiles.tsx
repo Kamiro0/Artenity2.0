@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { getUsuarios } from "../services/api";
-import "../styles/perfil.css";
+import "../styles/perfiles.css";
 
 interface Usuario {
   id: number;
