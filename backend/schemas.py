@@ -1,11 +1,10 @@
-from pydantic import BaseModel, ConfigDict, EmailStr
+from pydantic import BaseModel, EmailStr
 from datetime import date
 
 class UsuarioBase(BaseModel):
     nombre: str
     apellido: str
     correo_electronico: EmailStr
-    contrasena: str
     fecha_nacimiento: date
     genero: str
     tipo_arte_preferido: str
@@ -13,8 +12,11 @@ class UsuarioBase(BaseModel):
     nombre_usuario: str
 
 class UsuarioCreate(UsuarioBase):
-    pass
+    contrasena: str
 
 class UsuarioResponse(UsuarioBase):
     id_usuario: int
-    model_config = ConfigDict(from_attributes=True)
+    rol: str
+
+    class Config:
+        orm_mode = True

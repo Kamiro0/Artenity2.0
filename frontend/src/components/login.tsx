@@ -9,10 +9,12 @@ import appleImg from "../assets/img/apple.png";
 import discordImg from "../assets/img/discord.png";
 import instagramImg from "../assets/img/instagram.png";
 import { loginUsuario } from "../services/api";
+import { useAuth } from "../context/AuthContext";
 
 const Login: React.FC = () => {
   const [correo_electronico, setCorreo] = useState("");
   const [contrasena, setContrasena] = useState("");
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -21,24 +23,20 @@ const Login: React.FC = () => {
     try {
       const res = await loginUsuario(correo_electronico, contrasena);
 
-      console.log("Respuesta del backend:", res); // 🔍 Para depurar
-
       if (res && res.token) {
-        localStorage.setItem("token", res.token);
-
-        // 🔥 Redirige directo a tu PaginaPrincipal
-        navigate("/paginaprincipal");
+        login(res.token, res.usuario); 
+        navigate("/principal");  
       } else {
         alert("❌ No se recibió token válido. Verifica el backend.");
       }
-    } catch (error) {
+    } catch {
       alert("❌ Credenciales incorrectas o error de conexión");
     }
   };
 
   return (
     <div>
-      {/* Pinceladas */}
+      {/* Pinceladas decorativas */}
       <img src={brushImg} alt="Decoración" className="brush top-left" />
       <img src={brushImg} alt="Decoración" className="brush bottom-right" />
 
@@ -60,7 +58,7 @@ const Login: React.FC = () => {
             <label htmlFor="contrasena">CONTRASEÑA</label>
             <input
               type="password"
-              name="contrasena"  
+              name="contrasena"
               placeholder="CONTRASEÑA"
               value={contrasena}
               onChange={(e) => setContrasena(e.target.value)}

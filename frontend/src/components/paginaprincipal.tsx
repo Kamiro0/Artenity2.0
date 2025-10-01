@@ -1,21 +1,43 @@
 import { useEffect } from "react";
 import { Home, Compass, Grid, MessageSquare, Settings, Image } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import "../styles/paginaprincipal.css";
 import defaultProfile from "../assets/img/fotoperfildefault.jpg";
+import { useAuth } from "../context/AuthContext";
 
 export default function PaginaPrincipal() {
+  const { usuario, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login"); // redirige al login
+  };
+
   useEffect(() => {
     document.body.classList.add("pagina-principal");
     return () => {
       document.body.classList.remove("pagina-principal");
     };
   }, []);
+
   return (
     <div className="main-container">
-      {/* Sidebar */}
+      {/* Sidebar izquierda */}
       <aside className="sidebar">
         <div>
-          <div className="text-center text-2xl font-bold mb-8">🎨 Artenity</div>
+          <div className="text-center text-2xl font-bold mb-4">🎨 Artenity</div>
+          <div className="text-center mb-6">
+            <img
+              src={defaultProfile}
+              alt="Perfil"
+              className="w-16 h-16 rounded-full mx-auto mb-2"
+            />
+            <p className="text-lg font-semibold">
+              {usuario ? `Hola, ${usuario}` : "Usuario"}
+            </p>
+          </div>
+
           <nav className="space-y-4">
             <button className="flex items-center gap-3 w-full px-3 py-2 rounded-xl hover:bg-purple-700/60"><Home /> Home</button>
             <button className="flex items-center gap-3 w-full px-3 py-2 rounded-xl hover:bg-purple-700/60"><Compass /> Explorar</button>
@@ -26,13 +48,7 @@ export default function PaginaPrincipal() {
           </nav>
         </div>
         <button className="post-btn mt-8">POST</button>
-        <button
-          className="post-btn mt-4"
-          onClick={() => {
-            localStorage.removeItem("token");
-            window.location.href = "/login";
-          }}
-        >
+        <button className="post-btn mt-4" onClick={handleLogout}>
           CERRAR SESIÓN
         </button>
       </aside>
@@ -49,27 +65,12 @@ export default function PaginaPrincipal() {
           <button>POST</button>
         </div>
         <div className="banner">NUEVOS POSTERS!!</div>
-        {/* Aquí puedes renderizar los posts reales */}
       </section>
 
       {/* Sidebar derecha */}
       <aside className="right-sidebar">
         <input type="text" placeholder="Buscar" />
-        <div className="card">
-          <h2>COMUNIDADES A SEGUIR</h2>
-          <div className="user"><span>COMUNIDAD.NAME</span></div>
-          <div className="user"><span>COMUNIDAD.NAME</span></div>
-        </div>
-        <div className="card">
-          <h2>LO QUE SUCEDE CON EL MUNDO DEL ARTE</h2>
-          <div className="user"><span>@USER.NAME</span></div>
-          <div>Sistemas nuevos para dibujo</div>
-        </div>
-        <div className="card">
-          <h2>A QUIÉN SEGUIR</h2>
-          <div className="user"><span>USER.NAME</span><button className="follow-btn">+</button></div>
-          <div className="user"><span>USER.NAME</span><button className="follow-btn">+</button></div>
-        </div>
+        {/* contenido adicional */}
       </aside>
     </div>
   );

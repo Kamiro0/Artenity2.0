@@ -5,3 +5,7 @@
 # se crearon las carpetas database.py, main.py, models.py, schemas.py
 # iniciar backend FastAPI antes de iniciar el frotend (uvicorn backend.main:app --reload) 
 # iniciar frontend con npm start
+# database.py → motor, sesión y get_db (dependencia).
+# models.py → tablas de SQLAlchemy.
+# schemas.py → validaciones con Pydantic.
+# main.py → usas Depends(get_db) en los endpoints para acceder a la BD.
