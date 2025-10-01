@@ -13,3 +13,5 @@ class Usuario(Base):
     tipo_arte_preferido = Column(String)
     telefono = Column(String)
     nombre_usuario = Column(String)
+    rol = Column(String, default="usuario")
+    avatar = Column(String, nullable=True)

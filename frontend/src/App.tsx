@@ -3,8 +3,8 @@ import { useAuth } from "./context/AuthContext";
 import Artenity from "./components/artenity";
 import Login from "./components/login";
 import Register from "./components/register";
-import PaginaPrincipal from "./components/paginaprincipal";
-import Perfil from "./components/perfiles";
+import PaginaPrincipal from "./components/paginaprincipal"; // default export
+import Perfil from "./components/perfil"; // default export
 import Busqueda from "./components/busqueda";
 
 function App() {
@@ -32,4 +32,4 @@ function App() {
   );
 }
 
-export default App; // ✅ esto es obligatorio para que index.tsx funcione
+export default App;

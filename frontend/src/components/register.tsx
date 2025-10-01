@@ -32,7 +32,7 @@ const Register: React.FC = () => {
     e.preventDefault();
     try {
       const nuevo = await registerUsuario(form);
-      setMensaje(`Usuario registrado: ${nuevo.nombre_usuario}`);
+      setMensaje(`Usuario registrado: ${nuevo.id_usuario}`);
       setForm({
         nombre: "",
         apellido: "",

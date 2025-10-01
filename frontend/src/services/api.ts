@@ -1,14 +1,8 @@
-
+// services/api.ts
 import axios from "axios";
+import { Usuario } from "../context/AuthContext";
 
-export async function getCategorias(): Promise<any> {
-  const res = await fetch("http://localhost:8000/categorias");
-  if (!res.ok) throw new Error("Error al obtener categorías");
-  return res.json();
-}
-
-
-const API_URL = "http://localhost:8000"; 
+const API_URL = "http://localhost:8000";
 
 const api = axios.create({
   baseURL: API_URL,
@@ -17,7 +11,9 @@ const api = axios.create({
   },
 });
 
-export async function getUsuarios(): Promise<any> {
+// ---------- USUARIOS ----------
+
+export async function getUsuarios(): Promise<Usuario[]> {
   try {
     const res = await api.get("/usuarios");
     return res.data;
@@ -27,7 +23,7 @@ export async function getUsuarios(): Promise<any> {
   }
 }
 
-export async function addUsuario(usuario: any): Promise<any> {
+export async function addUsuario(usuario: any): Promise<Usuario> {
   try {
     const res = await api.post("/usuarios", usuario);
     return res.data;
@@ -37,7 +33,7 @@ export async function addUsuario(usuario: any): Promise<any> {
   }
 }
 
-export async function deleteUsuario(id: number): Promise<any> {
+export async function deleteUsuario(id: number): Promise<Usuario> {
   try {
     const res = await api.delete(`/usuarios/${id}`);
     return res.data;
@@ -47,7 +43,7 @@ export async function deleteUsuario(id: number): Promise<any> {
   }
 }
 
-export async function registerUsuario(usuario: any): Promise<any> {
+export async function registerUsuario(usuario: any): Promise<Usuario> {
   try {
     const res = await api.post("/usuarios", usuario);
     return res.data;
@@ -57,36 +53,73 @@ export async function registerUsuario(usuario: any): Promise<any> {
   }
 }
 
-export async function loginUsuario(correo_electronico: string, contrasena: string): Promise<any> {
+// ---------- LOGIN ----------
+
+export async function loginUsuario(correo_electronico: string, contrasena: string): Promise<{ token: string; usuario: Usuario }> {
   try {
     const res = await api.post("/login", { correo_electronico, contrasena });
-    if (res.data.token) {
-      localStorage.setItem("token", res.data.token);
-    }
-    return res.data;
+    const { token, usuario } = res.data;
+    localStorage.setItem("token", token);
+    localStorage.setItem("usuario", JSON.stringify(usuario));
+    return { token, usuario };
   } catch (error: any) {
     console.error("❌ Error al iniciar sesión:", error.message);
     throw error;
   }
 }
 
-export async function getUsuarioActual(): Promise<any> {
+// ---------- ACTUALIZAR USUARIO ----------
+
+export async function updateUsuario(usuario_id: number, data: FormData): Promise<Usuario> {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("No hay sesión activa");
+
+  try {
+    const res = await api.put(`/usuarios/${usuario_id}`, data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return res.data;
+  } catch (error: any) {
+    console.error("❌ Error al actualizar usuario:", error);
+    throw error;
+  }
+}
+
+// ---------- CATEGORÍAS ----------
+
+export async function getCategorias(): Promise<any> {
+  try {
+    const res = await api.get("/categorias");
+    return res.data;
+  } catch (error: any) {
+    console.error("❌ Error al obtener categorías:", error.message);
+    throw error;
+  }
+}
+
+// ---------- LOGOUT ----------
+
+export function logoutUsuario(): void {
+  localStorage.removeItem("token");
+  localStorage.removeItem("usuario");
+}
+
+// ---------- OPCIONAL: obtener usuario actual ----------
+
+export async function getUsuarioActual(): Promise<Usuario> {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("No hay sesión activa");
 
   try {
     const res = await api.get("/me", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { Authorization: `Bearer ${token}` },
     });
     return res.data;
   } catch (error: any) {
     console.error("❌ Error al obtener usuario actual:", error.message);
     throw error;
   }
-}
-
-export function logoutUsuario(): void {
-  localStorage.removeItem("token");
 }
