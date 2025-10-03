@@ -6,7 +6,7 @@ import Register from "./components/register";
 import PaginaPrincipal from "./components/paginaprincipal"; // default export
 import Perfil from "./components/perfil"; // default export
 import Busqueda from "./components/busqueda";
-
+import Messages from './components/Messages';
 function App() {
   const { token } = useAuth();
 
@@ -28,6 +28,7 @@ function App() {
       />
       <Route path="/busqueda" element={<Busqueda />} />
       <Route path="*" element={<Navigate to="/login" />} />
+      <Route path="/mensajes" element={<Messages />} />
     </Routes>
   );
 }

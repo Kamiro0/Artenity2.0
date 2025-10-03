@@ -16,7 +16,6 @@ class UsuarioCreate(UsuarioBase):
 
 class UsuarioResponse(UsuarioBase):
     id_usuario: int
-    rol: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True

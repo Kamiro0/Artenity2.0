@@ -72,7 +72,21 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
     usuario = db.query(models.Usuario).filter(models.Usuario.correo_electronico == data.correo_electronico).first()
     if not usuario or usuario.contrasena != data.contrasena:
         raise HTTPException(status_code=400, detail="Credenciales incorrectas")
-    return {"token": "fake-token", "usuario": usuario.nombre_usuario}
+    # Devuelve el usuario completo
+    return {
+        "token": "fake-token",
+        "usuario": {
+            "id_usuario": usuario.id_usuario,
+            "nombre": usuario.nombre,
+            "apellido": usuario.apellido,
+            "correo_electronico": usuario.correo_electronico,
+            "fecha_nacimiento": usuario.fecha_nacimiento,
+            "genero": usuario.genero,
+            "tipo_arte_preferido": usuario.tipo_arte_preferido,
+            "telefono": usuario.telefono,
+            "nombre_usuario": usuario.nombre_usuario
+        }
+    }
 
 @app.put("/usuarios/{usuario_id}", response_model=schemas.UsuarioResponse)
 def update_usuario(

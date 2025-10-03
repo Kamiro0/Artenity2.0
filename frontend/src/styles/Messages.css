@@ -1,0 +1,175 @@
+.messages-container {
+  display: flex;
+  width:200%;
+  height: 100vh;
+  background: #0a0021;
+  color: #fff;
+  font-family: Arial, sans-serif;
+}
+
+/* Panel izquierdo */
+.chat-list {
+  width: 25%;
+  background: #1a0036;
+  padding: 15px;
+  overflow-y: auto;
+}
+
+.chat-item {
+  padding: 12px;
+  margin: 10px 0;
+  background: #2c0057;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.chat-item:hover {
+  background: #3a0070;
+}
+
+.chat-item.active {
+  background: #4a0088;
+}
+
+.chat-username {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.chat-last {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+/* Panel derecho */
+.chat-window {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: url("https://i.ibb.co/VxHdzPn/bg.jpg") center/cover;
+}
+
+.chat-header {
+  padding: 15px;
+  background: #22004a;
+  font-weight: bold;
+}
+
+.chat-messages {
+  flex: 1;
+  padding: 15px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chat-bubble {
+  max-width: 60%;
+  padding: 10px 15px;
+  border-radius: 12px;
+  font-size: 14px;
+}
+
+.chat-bubble.other {
+  background: #3d005c;
+  align-self: flex-start;
+}
+
+.chat-bubble.me {
+  background: #7b1fa2;
+  align-self: flex-end;
+}
+
+/* Input */
+.chat-input {
+  display: flex;
+  padding: 10px;
+  background: #22004a;
+}
+
+.chat-input input {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  outline: none;
+}
+
+.chat-input button {
+  margin-left: 10px;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 8px;
+  background: #7b1fa2;
+  color: #fff;
+  cursor: pointer;
+}
+.icon-sidebar-container {
+  position: absolute;
+  left: 880px; /* Cambia la posición horizontal */
+  top: 270px;  /* Cambia la posición vertical */
+  display: flex;
+  gap: 24px;  /* Espacio entre barras */
+  z-index: 10;
+  width: 160px; /* Ajusta el ancho total */
+}
+
+.icon-bar {
+  min-width: 60px;         /* ancho mínimo, puedes aumentar este valor */
+  width: 60px;             /* ancho fijo, cámbialo si quieres más ancho */
+  max-width: 100px;        /* ancho máximo opcional */
+  background: #0a1747;
+  border-radius: 32px;
+  padding: 16px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  border: 2px solid #1a2a6c;
+  /* Puedes mover el contenedor usando margin si lo necesitas */
+}
+
+.icon-bar i {
+  font-size: 2rem;
+  margin: 8px 0;
+  transition: transform 0.2s;
+}
+
+.icon-bar i:hover {
+  transform: scale(1.15);
+  filter: brightness(1.2);
+}
+/* Contenedor negro encima del anterior */
+.icon-sidebar-overlay {
+  position: absolute;
+  left: 990px;   /* Ajusta la posición horizontal para que esté encima */
+  top: 270px;    /* Ajusta la posición vertical para que esté encima */
+  width: 60px;  /* Ajusta el ancho según lo necesites */
+  height: 190px; /* Ajusta el alto según lo necesites */
+  background: #000;
+  border-radius: 36px;
+  opacity: 0.95;
+  z-index: 20;   /* Mayor que el anterior para que esté encima */
+  box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.icon-image-btn {
+  background: none;
+  border: none;
+  padding: 8px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.icon-image-btn img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  display: block;
+}
