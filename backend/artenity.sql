@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 15-09-2025 a las 06:37:56
+-- Tiempo de generación: 05-10-2025 a las 23:51:28
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.0.30
 
@@ -731,6 +731,32 @@ INSERT INTO `preferencias_arte` (`id_preferencia`, `id_usuario`, `categoria`) VA
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `publicaciones`
+--
+
+CREATE TABLE `publicaciones` (
+  `id_publicacion` int(11) NOT NULL,
+  `id_usuario` int(11) NOT NULL,
+  `contenido` varchar(255) NOT NULL,
+  `imagen` varchar(255) DEFAULT NULL,
+  `fecha_creacion` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `publicaciones`
+--
+
+INSERT INTO `publicaciones` (`id_publicacion`, `id_usuario`, `contenido`, `imagen`, `fecha_creacion`) VALUES
+(1, 1, 'Esta es una publicación de prueba', 'imagen1.jpg', '2025-10-05 15:00:28'),
+(2, 1, 'hola', NULL, '2025-10-05 20:09:32'),
+(3, 1, 'hola', NULL, '2025-10-05 20:11:58'),
+(4, 1, '', 'http://localhost:8000/static/posts\\1_1.png', '2025-10-05 20:12:19'),
+(5, 51, 'hola si', 'http://localhost:8000/static/posts\\51_ARTIVERSE.drawio.png', '2025-10-05 20:16:42'),
+(6, 49, 'HOLA COMO ESTAN EPERO QUE BIEN ', 'http://localhost:8000/static/posts\\49_8d3bec423a4c16808c32fdb6f28a44e8.jpg', '2025-10-05 20:59:16');
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `publicaciones_obra`
 --
 
@@ -1175,7 +1201,7 @@ CREATE TABLE `solicitudes_amistad` (
 --
 
 CREATE TABLE `usuarios` (
-  `id_usuario` int(11) NOT NULL AUTO_INCREMENT,
+  `id_usuario` int(11) NOT NULL,
   `nombre` varchar(100) NOT NULL,
   `apellido` varchar(100) NOT NULL,
   `correo_electronico` varchar(100) NOT NULL,
@@ -1184,9 +1210,9 @@ CREATE TABLE `usuarios` (
   `genero` varchar(20) DEFAULT NULL,
   `tipo_arte_preferido` varchar(100) DEFAULT NULL,
   `telefono` varchar(50) NOT NULL,
-  `nombre_usuario` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`id_usuario`)
+  `nombre_usuario` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 --
 -- Volcado de datos para la tabla `usuarios`
 --
@@ -1390,6 +1416,13 @@ ALTER TABLE `preferencias_arte`
   ADD KEY `id_usuario` (`id_usuario`);
 
 --
+-- Indices de la tabla `publicaciones`
+--
+ALTER TABLE `publicaciones`
+  ADD PRIMARY KEY (`id_publicacion`),
+  ADD KEY `id_usuario` (`id_usuario`);
+
+--
 -- Indices de la tabla `publicaciones_obra`
 --
 ALTER TABLE `publicaciones_obra`
@@ -1439,8 +1472,7 @@ ALTER TABLE `solicitudes_amistad`
 -- Indices de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  ADD PRIMARY KEY (`id_usuario`),
-  ADD UNIQUE KEY `correo_electronico` (`correo_electronico`);
+  ADD PRIMARY KEY (`id_usuario`);
 
 --
 -- Indices de la tabla `usuarios_bloqueados`
@@ -1455,118 +1487,10 @@ ALTER TABLE `usuarios_bloqueados`
 --
 
 --
--- AUTO_INCREMENT de la tabla `categorias_obra`
+-- AUTO_INCREMENT de la tabla `publicaciones`
 --
-ALTER TABLE `categorias_obra`
-  MODIFY `id_categoria` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
-
---
--- AUTO_INCREMENT de la tabla `colecciones_arte`
---
-ALTER TABLE `colecciones_arte`
-  MODIFY `id_coleccion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=61;
-
---
--- AUTO_INCREMENT de la tabla `colecciones_obras`
---
-ALTER TABLE `colecciones_obras`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
-
---
--- AUTO_INCREMENT de la tabla `comentarios_obra`
---
-ALTER TABLE `comentarios_obra`
-  MODIFY `id_comentario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
-
---
--- AUTO_INCREMENT de la tabla `configuracion_usuario`
---
-ALTER TABLE `configuracion_usuario`
-  MODIFY `id_configuracion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
-
---
--- AUTO_INCREMENT de la tabla `galeria_arte`
---
-ALTER TABLE `galeria_arte`
-  MODIFY `id_galeria` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
-
---
--- AUTO_INCREMENT de la tabla `guardados_obra`
---
-ALTER TABLE `guardados_obra`
-  MODIFY `id_guardado` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
-
---
--- AUTO_INCREMENT de la tabla `historial_interacciones_obra`
---
-ALTER TABLE `historial_interacciones_obra`
-  MODIFY `id_historial` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
-
---
--- AUTO_INCREMENT de la tabla `likes_obra`
---
-ALTER TABLE `likes_obra`
-  MODIFY `id_like` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
-
---
--- AUTO_INCREMENT de la tabla `mensajes_privados`
---
-ALTER TABLE `mensajes_privados`
-  MODIFY `id_mensaje` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
-
---
--- AUTO_INCREMENT de la tabla `notificaciones`
---
-ALTER TABLE `notificaciones`
-  MODIFY `id_notificacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
-
---
--- AUTO_INCREMENT de la tabla `perfiles`
---
-ALTER TABLE `perfiles`
-  MODIFY `id_perfil` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
-
---
--- AUTO_INCREMENT de la tabla `preferencias_arte`
---
-ALTER TABLE `preferencias_arte`
-  MODIFY `id_preferencia` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
-
---
--- AUTO_INCREMENT de la tabla `publicaciones_obra`
---
-ALTER TABLE `publicaciones_obra`
-  MODIFY `id_publicacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=91;
-
---
--- AUTO_INCREMENT de la tabla `registro_actividad`
---
-ALTER TABLE `registro_actividad`
-  MODIFY `id_actividad` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
-
---
--- AUTO_INCREMENT de la tabla `reportes_contenido`
---
-ALTER TABLE `reportes_contenido`
-  MODIFY `id_reporte` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
-
---
--- AUTO_INCREMENT de la tabla `seguidores_usuario`
---
-ALTER TABLE `seguidores_usuario`
-  MODIFY `id_seguimiento` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=142;
-
---
--- AUTO_INCREMENT de la tabla `seguimiento_usuario`
---
-ALTER TABLE `seguimiento_usuario`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
-
---
--- AUTO_INCREMENT de la tabla `solicitudes_amistad`
---
-ALTER TABLE `solicitudes_amistad`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `publicaciones`
+  MODIFY `id_publicacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`
@@ -1575,140 +1499,14 @@ ALTER TABLE `usuarios`
   MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
 
 --
--- AUTO_INCREMENT de la tabla `usuarios_bloqueados`
---
-ALTER TABLE `usuarios_bloqueados`
-  MODIFY `id_bloqueo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
-
---
 -- Restricciones para tablas volcadas
 --
 
 --
--- Filtros para la tabla `colecciones_arte`
+-- Filtros para la tabla `publicaciones`
 --
-ALTER TABLE `colecciones_arte`
-  ADD CONSTRAINT `colecciones_arte_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`);
-
---
--- Filtros para la tabla `colecciones_obras`
---
-ALTER TABLE `colecciones_obras`
-  ADD CONSTRAINT `colecciones_obras_ibfk_1` FOREIGN KEY (`id_coleccion`) REFERENCES `colecciones_arte` (`id_coleccion`),
-  ADD CONSTRAINT `colecciones_obras_ibfk_2` FOREIGN KEY (`id_publicacion`) REFERENCES `publicaciones_obra` (`id_publicacion`);
-
---
--- Filtros para la tabla `comentarios_obra`
---
-ALTER TABLE `comentarios_obra`
-  ADD CONSTRAINT `comentarios_obra_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`),
-  ADD CONSTRAINT `comentarios_obra_ibfk_2` FOREIGN KEY (`id_publicacion`) REFERENCES `publicaciones_obra` (`id_publicacion`),
-  ADD CONSTRAINT `comentarios_obra_ibfk_3` FOREIGN KEY (`id_comentario_padre`) REFERENCES `comentarios_obra` (`id_comentario`);
-
---
--- Filtros para la tabla `configuracion_usuario`
---
-ALTER TABLE `configuracion_usuario`
-  ADD CONSTRAINT `configuracion_usuario_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`);
-
---
--- Filtros para la tabla `galeria_arte`
---
-ALTER TABLE `galeria_arte`
-  ADD CONSTRAINT `galeria_arte_ibfk_1` FOREIGN KEY (`id_publicacion`) REFERENCES `publicaciones_obra` (`id_publicacion`);
-
---
--- Filtros para la tabla `guardados_obra`
---
-ALTER TABLE `guardados_obra`
-  ADD CONSTRAINT `guardados_obra_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`),
-  ADD CONSTRAINT `guardados_obra_ibfk_2` FOREIGN KEY (`id_publicacion`) REFERENCES `publicaciones_obra` (`id_publicacion`);
-
---
--- Filtros para la tabla `historial_interacciones_obra`
---
-ALTER TABLE `historial_interacciones_obra`
-  ADD CONSTRAINT `historial_interacciones_obra_ibfk_1` FOREIGN KEY (`id_publicacion`) REFERENCES `publicaciones_obra` (`id_publicacion`),
-  ADD CONSTRAINT `historial_interacciones_obra_ibfk_2` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`);
-
---
--- Filtros para la tabla `likes_obra`
---
-ALTER TABLE `likes_obra`
-  ADD CONSTRAINT `likes_obra_ibfk_1` FOREIGN KEY (`id_publicacion`) REFERENCES `publicaciones_obra` (`id_publicacion`),
-  ADD CONSTRAINT `likes_obra_ibfk_2` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`);
-
---
--- Filtros para la tabla `mensajes_privados`
---
-ALTER TABLE `mensajes_privados`
-  ADD CONSTRAINT `mensajes_privados_ibfk_1` FOREIGN KEY (`id_emisor`) REFERENCES `usuarios` (`id_usuario`),
-  ADD CONSTRAINT `mensajes_privados_ibfk_2` FOREIGN KEY (`id_receptor`) REFERENCES `usuarios` (`id_usuario`);
-
---
--- Filtros para la tabla `notificaciones`
---
-ALTER TABLE `notificaciones`
-  ADD CONSTRAINT `notificaciones_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`);
-
---
--- Filtros para la tabla `perfiles`
---
-ALTER TABLE `perfiles`
-  ADD CONSTRAINT `perfiles_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`);
-
---
--- Filtros para la tabla `preferencias_arte`
---
-ALTER TABLE `preferencias_arte`
-  ADD CONSTRAINT `preferencias_arte_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`);
-
---
--- Filtros para la tabla `publicaciones_obra`
---
-ALTER TABLE `publicaciones_obra`
-  ADD CONSTRAINT `publicaciones_obra_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`),
-  ADD CONSTRAINT `publicaciones_obra_ibfk_2` FOREIGN KEY (`id_categoria`) REFERENCES `categorias_obra` (`id_categoria`);
-
---
--- Filtros para la tabla `registro_actividad`
---
-ALTER TABLE `registro_actividad`
-  ADD CONSTRAINT `registro_actividad_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`);
-
---
--- Filtros para la tabla `reportes_contenido`
---
-ALTER TABLE `reportes_contenido`
-  ADD CONSTRAINT `reportes_contenido_ibfk_1` FOREIGN KEY (`id_usuario_reportado`) REFERENCES `usuarios` (`id_usuario`),
-  ADD CONSTRAINT `reportes_contenido_ibfk_2` FOREIGN KEY (`id_usuario_reportante`) REFERENCES `usuarios` (`id_usuario`);
-
---
--- Filtros para la tabla `seguidores_usuario`
---
-ALTER TABLE `seguidores_usuario`
-  ADD CONSTRAINT `seguidores_usuario_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`),
-  ADD CONSTRAINT `seguidores_usuario_ibfk_2` FOREIGN KEY (`id_seguidor`) REFERENCES `usuarios` (`id_usuario`);
-
---
--- Filtros para la tabla `seguimiento_usuario`
---
-ALTER TABLE `seguimiento_usuario`
-  ADD CONSTRAINT `seguimiento_usuario_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`);
-
---
--- Filtros para la tabla `solicitudes_amistad`
---
-ALTER TABLE `solicitudes_amistad`
-  ADD CONSTRAINT `solicitudes_amistad_ibfk_1` FOREIGN KEY (`usuario_id_origen`) REFERENCES `usuarios` (`id_usuario`),
-  ADD CONSTRAINT `solicitudes_amistad_ibfk_2` FOREIGN KEY (`usuario_id_destino`) REFERENCES `usuarios` (`id_usuario`);
-
---
--- Filtros para la tabla `usuarios_bloqueados`
---
-ALTER TABLE `usuarios_bloqueados`
-  ADD CONSTRAINT `usuarios_bloqueados_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`),
-  ADD CONSTRAINT `usuarios_bloqueados_ibfk_2` FOREIGN KEY (`id_bloqueado`) REFERENCES `usuarios` (`id_usuario`);
+ALTER TABLE `publicaciones`
+  ADD CONSTRAINT `publicaciones_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
