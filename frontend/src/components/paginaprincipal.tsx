@@ -13,7 +13,7 @@ export default function PaginaPrincipal() {
   const [contenido, setContenido] = useState("");
   const [file, setFile] = useState<File | null>(null);
 
-  // 🔹 Añadir clase al body
+  // Añadir clase al body
   useEffect(() => {
     document.body.classList.add("pagina-principal");
     return () => {
@@ -21,12 +21,17 @@ export default function PaginaPrincipal() {
     };
   }, []);
 
-  // 🔹 Cargar posts al inicio
+  // Cargar publicaciones
   useEffect(() => {
-    getPublicaciones().then(setPublicaciones);
+    cargarPublicaciones();
   }, []);
 
-  // 🔹 Crear nueva publicación
+  const cargarPublicaciones = async () => {
+    const posts = await getPublicaciones();
+    setPublicaciones(posts);
+  };
+
+  // Crear publicación
   const handlePost = async () => {
     if (!contenido.trim() && !file) return;
 
@@ -38,11 +43,10 @@ export default function PaginaPrincipal() {
     await crearPublicacion(data);
     setContenido("");
     setFile(null);
-    const posts = await getPublicaciones();
-    setPublicaciones(posts);
+    await cargarPublicaciones();
   };
 
-  // 🔹 Cerrar sesión
+  // Cerrar sesión
   const handleLogout = () => {
     localStorage.removeItem("token");
     window.location.href = "/login";
@@ -62,7 +66,7 @@ export default function PaginaPrincipal() {
         </button>
       </div>
 
-      {/* Sidebar izquierda */}
+      {/* 🔹 Sidebar izquierda */}
       <aside className="sidebar">
         <div>
           <div className="text-center text-2xl font-bold mb-8">🎨 Artenity</div>
@@ -90,6 +94,7 @@ export default function PaginaPrincipal() {
             </button>
           </nav>
         </div>
+
         <button className="post-btn mt-8" onClick={handlePost}>
           POST
         </button>
@@ -98,7 +103,7 @@ export default function PaginaPrincipal() {
         </button>
       </aside>
 
-      {/* Sección central */}
+      {/* 🔹 Sección central */}
       <section className="center-section">
         <div className="tabs">
           <button>PARA TI</button>
@@ -106,7 +111,7 @@ export default function PaginaPrincipal() {
           <button>GUARDADO</button>
         </div>
 
-        {/* 🔹 Crear nuevo post */}
+        {/* Crear nuevo post */}
         <div className="post-input">
           <input
             type="text"
@@ -124,28 +129,57 @@ export default function PaginaPrincipal() {
 
         <div className="banner">NUEVOS POSTERS!!</div>
 
-        {/* 🔹 Listado de publicaciones */}
+        {/* 🔹 Publicación destacada */}
         <div className="posts">
+          <div className="post-card featured-post">
+            <div className="post-header">
+              <img src={defaultProfile} alt="perfil" className="avatar" />
+              <div className="user-info">
+                <span className="username">USER NAME</span>
+                <span className="user-handle">@USERNAME</span>
+                <span className="timestamp">· 7H</span>
+              </div>
+            </div>
+            <div className="post-content">
+              <p><strong>LO MÁS VISTO SOBRE EL ARTE DE VAN GOGH</strong></p>
+            </div>
+            <div className="post-actions">
+              <button className="action-btn">💬 284</button>
+              <button className="action-btn">🔄 156</button>
+              <button className="action-btn">❤️ 1.2K</button>
+              <button className="action-btn">📤</button>
+            </div>
+          </div>
+
+          {/* 🔹 Publicaciones dinámicas */}
           {publicaciones.map((post) => (
             <div key={post.id_publicacion} className="post-card">
               <div className="post-header">
                 <img src={defaultProfile} alt="perfil" className="avatar" />
-                <span>@{post.id_usuario}</span>
+                <div className="user-info">
+                  <span className="username">{post.nombre_usuario || `Usuario${post.id_usuario}`}</span>
+                  <span className="user-handle">@{post.username || `user${post.id_usuario}`}</span>
+                  <span className="timestamp">· {post.fecha_creacion || "Reciente"}</span>
+                </div>
               </div>
-              <p>{post.contenido}</p>
-              {post.imagen && (
-                <img
-                  src={post.imagen}
-                  alt="imagen del post"
-                  className="post-image"
-                />
-              )}
+              <div className="post-content">
+                <p>{post.contenido}</p>
+                {post.imagen && (
+                  <img src={post.imagen} alt="imagen del post" className="post-image" />
+                )}
+              </div>
+              <div className="post-actions">
+                <button className="action-btn">💬</button>
+                <button className="action-btn">🔄</button>
+                <button className="action-btn">❤️</button>
+                <button className="action-btn">📤</button>
+              </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Sidebar derecha */}
+      {/* 🔹 Sidebar derecha */}
       <aside className="right-sidebar">
         <div className="card">
           <h2>COMUNIDADES A SEGUIR</h2>

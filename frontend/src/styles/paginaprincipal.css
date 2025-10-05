@@ -265,3 +265,148 @@ body.pagina-principal {
   transform: scale(1.1);
   border-color: #ec4899;
 }
+/* Estilos específicos para publicaciones tipo Twitter */
+.posts {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+}
+
+.post-card {
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+}
+
+.post-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  transform: translateY(-1px);
+}
+
+/* Separación entre publicaciones */
+.post-card + .post-card {
+  margin-top: 8px;
+}
+
+/* Header de la publicación */
+.post-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+/* Avatar redondo */
+.avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e0e0e0;
+}
+
+/* Información del usuario */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.username {
+  font-weight: 700;
+  color: #000;
+  font-size: 15px;
+}
+
+.user-handle {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.timestamp {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+/* Contenido de la publicación */
+.post-content {
+  margin-bottom: 12px;
+}
+
+.post-content p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.4;
+  color: #1f2937;
+  word-break: break-word;
+}
+
+/* Imagen de la publicación */
+.post-image {
+  width: 100%;
+  max-height: 400px;
+  border-radius: 12px;
+  object-fit: cover;
+  margin-top: 12px;
+  border: 1px solid #f0f0f0;
+}
+
+/* Acciones de la publicación */
+.post-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 1px solid #f8f8f8;
+  max-width: 80%;
+}
+
+.action-btn {
+  background: none;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.action-btn:hover {
+  background: rgba(29, 155, 240, 0.1);
+  color: #1d9bf0;
+}
+
+/* Publicación destacada */
+.featured-post {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+}
+
+.featured-post .username,
+.featured-post .user-handle,
+.featured-post .timestamp,
+.featured-post p {
+  color: rgb(255, 255, 255);
+}
+
+.featured-post .post-actions {
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.featured-post .action-btn {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.featured-post .action-btn:hover {
+  color: rgb(255, 255, 255);
+  background: rgba(255, 255, 255, 0.1);
+}
