@@ -9,3 +9,4 @@
 # models.py → tablas de SQLAlchemy.
 # schemas.py → validaciones con Pydantic.
 # main.py → usas Depends(get_db) en los endpoints para acceder a la BD.
+# source myenv/Scripts/activate

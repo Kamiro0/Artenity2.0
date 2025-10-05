@@ -123,3 +123,25 @@ export async function getUsuarioActual(): Promise<Usuario> {
     throw error;
   }
 }
+// ---------- PUBLICACIONES ----------
+export async function crearPublicacion(data: FormData): Promise<any> {
+  try {
+    const res = await api.post("/publicaciones", data, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return res.data;
+  } catch (error: any) {
+    console.error("❌ Error al crear publicación:", error.message);
+    throw error;
+  }
+}
+
+export async function getPublicaciones(): Promise<any[]> {
+  try {
+    const res = await api.get("/publicaciones");
+    return res.data;
+  } catch (error: any) {
+    console.error("❌ Error al obtener publicaciones:", error.message);
+    throw error;
+  }
+}

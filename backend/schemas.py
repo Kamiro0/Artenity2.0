@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr
-from datetime import date
+from datetime import date , datetime
 
 class UsuarioBase(BaseModel):
     nombre: str
@@ -17,5 +17,21 @@ class UsuarioCreate(UsuarioBase):
 class UsuarioResponse(UsuarioBase):
     id_usuario: int
 
+    class Config:
+        from_attributes = True
+        
+       
+
+class PublicacionBase(BaseModel):
+    contenido: str
+    imagen: str | None = None
+
+class PublicacionCreate(PublicacionBase):
+    id_usuario: int
+
+class PublicacionResponse(PublicacionBase):
+    id_publicacion: int
+    id_usuario: int
+    fecha_creacion: datetime
     class Config:
         from_attributes = True

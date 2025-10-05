@@ -115,6 +115,41 @@ def update_usuario(
     db.refresh(usuario)
     return usuario
 
+# ------------------ PUBLICACIONES ------------------
+
+@app.post("/publicaciones", response_model=schemas.PublicacionResponse)
+async def crear_publicacion(
+    id_usuario: int = Form(...),
+    contenido: str = Form(...),
+    file: UploadFile | None = File(None),
+    db: Session = Depends(get_db)
+):
+    imagen_url = None
+    if file:
+        carpeta = "static/posts"
+        os.makedirs(carpeta, exist_ok=True)
+        filename = f"{id_usuario}_{file.filename}"
+        ruta = os.path.join(carpeta, filename)
+        with open(ruta, "wb") as f:
+            f.write(file.file.read())
+        imagen_url = f"http://localhost:8000/{ruta}"
+
+    nueva_pub = models.Publicacion(
+        id_usuario=id_usuario,
+        contenido=contenido,
+        imagen=imagen_url
+    )
+    db.add(nueva_pub)
+    db.commit()
+    db.refresh(nueva_pub)
+    return nueva_pub
+
+
+@app.get("/publicaciones", response_model=List[schemas.PublicacionResponse])
+def obtener_publicaciones(db: Session = Depends(get_db)):
+    publicaciones = db.query(models.Publicacion).order_by(models.Publicacion.fecha_creacion.desc()).all()
+    return publicaciones
+
 # ------------------ Home ------------------
 @app.get("/home")
 def home():
