@@ -1,10 +1,12 @@
-from sqlalchemy import Column, Integer, String, Date
-from .database import Base
+# backend/models.py
+from sqlalchemy import Column, Integer, String, Date, ForeignKey
 from sqlalchemy.orm import relationship
 from datetime import datetime
-from sqlalchemy import DateTime, ForeignKey
+from .database import Base
+
 class Usuario(Base):
     __tablename__ = "usuarios"
+
     id_usuario = Column(Integer, primary_key=True, index=True)
     nombre = Column(String)
     apellido = Column(String)
@@ -17,6 +19,19 @@ class Usuario(Base):
     nombre_usuario = Column(String)
 
 
+    perfil = relationship("Perfil", back_populates="usuario", uselist=False)
+    publicaciones = relationship("Publicacion", back_populates="usuario")
+
+class Perfil(Base):
+    __tablename__ = "perfiles"
+
+    id_perfil = Column(Integer, primary_key=True, index=True)
+    id_usuario = Column(Integer, ForeignKey("usuarios.id_usuario"), unique=True)
+    descripcion = Column(String(255), nullable=True)
+    foto_perfil = Column(String(255), nullable=True)  # ✅ Solo aquí
+    biografia = Column(String(500), nullable=True)
+
+    usuario = relationship("Usuario", back_populates="perfil")
 
 class Publicacion(Base):
     __tablename__ = "publicaciones"
@@ -25,6 +40,6 @@ class Publicacion(Base):
     id_usuario = Column(Integer, ForeignKey("usuarios.id_usuario"))
     contenido = Column(String, nullable=False)
     imagen = Column(String, nullable=True)
-    fecha_creacion = Column(DateTime, default=datetime.utcnow)
+    fecha_creacion = Column(Date, default=datetime.utcnow)
 
-    usuario = relationship("Usuario", backref="publicaciones")
+    usuario = relationship("Usuario", back_populates="publicaciones")

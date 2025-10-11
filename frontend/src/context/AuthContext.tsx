@@ -3,9 +3,9 @@ import React, { createContext, useContext, useState, ReactNode, useEffect } from
 
 export interface Usuario {
   id_usuario: number;
-  nombre: string;
+  nombre_usuario: string;
   correo_electronico: string;
-  avatar?: string;
+  foto_perfil?: string | null;
 }
 
 
@@ -59,3 +59,4 @@ export const useAuth = () => {
   if (!ctx) throw new Error("useAuth debe usarse dentro de AuthProvider");
   return ctx;
 };
+

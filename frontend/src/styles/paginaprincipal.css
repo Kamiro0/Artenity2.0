@@ -410,3 +410,19 @@ body.pagina-principal {
   color: rgb(255, 255, 255);
   background: rgba(255, 255, 255, 0.1);
 }
+.img-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.img-btn:hover {
+  transform: scale(1.05);
+  transition: transform 0.2s ease-in-out;
+}
+

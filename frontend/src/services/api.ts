@@ -145,3 +145,22 @@ export async function getPublicaciones(): Promise<any[]> {
     throw error;
   }
 }
+
+// ---------- PERFILES ----------
+export async function getPerfil(id_usuario: number) {
+  const res = await axios.get(`${API_URL}/perfiles/${id_usuario}`);
+  return res.data;
+}
+
+export async function crearPerfil(data: FormData) {
+  const res = await api.post(`/perfiles`, data);
+  return res.data;
+}
+
+export async function actualizarPerfil(id_usuario: number, data: FormData) {
+  const res = await axios.put(`${API_URL}/perfiles/${id_usuario}`, data, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return res.data;
+}
+
