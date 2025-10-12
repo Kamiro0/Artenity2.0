@@ -6,161 +6,169 @@ const API_URL = "http://localhost:8000";
 
 const api = axios.create({
   baseURL: API_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
+  headers: { "Content-Type": "application/json" },
 });
 
-// ---------- USUARIOS ----------
+// ======== UTIL ========
+function getToken() {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("No hay token de sesión");
+  return token;
+}
 
+function getUsuarioId() {
+  const usuario = localStorage.getItem("usuario");
+  if (!usuario) throw new Error("No hay usuario autenticado");
+  const parsed = JSON.parse(usuario);
+  return parsed.id_usuario;
+}
+
+// ======== USUARIOS ========
 export async function getUsuarios(): Promise<Usuario[]> {
-  try {
-    const res = await api.get("/usuarios");
-    return res.data;
-  } catch (error: any) {
-    console.error("❌ Error al obtener usuarios:", error.message);
-    throw error;
-  }
+  const res = await api.get("/usuarios", { headers: { token: getToken() } });
+  return res.data;
 }
 
 export async function addUsuario(usuario: any): Promise<Usuario> {
-  try {
-    const res = await api.post("/usuarios", usuario);
-    return res.data;
-  } catch (error: any) {
-    console.error("❌ Error al agregar usuario:", error.message);
-    throw error;
-  }
+  const res = await api.post("/usuarios", usuario);
+  return res.data;
 }
 
 export async function deleteUsuario(id: number): Promise<Usuario> {
-  try {
-    const res = await api.delete(`/usuarios/${id}`);
-    return res.data;
-  } catch (error: any) {
-    console.error("❌ Error al eliminar usuario:", error.message);
-    throw error;
-  }
+  const res = await api.delete(`/usuarios/${id}`);
+  return res.data;
 }
 
 export async function registerUsuario(usuario: any): Promise<Usuario> {
-  try {
-    const res = await api.post("/usuarios", usuario);
-    return res.data;
-  } catch (error: any) {
-    console.error("❌ Error al registrar usuario:", error.message);
-    throw error;
-  }
+  return addUsuario(usuario);
 }
 
-// ---------- LOGIN ----------
-
-export async function loginUsuario(correo_electronico: string, contrasena: string): Promise<{ token: string; usuario: Usuario }> {
-  try {
-    const res = await api.post("/login", { correo_electronico, contrasena });
-    const { token, usuario } = res.data;
-    localStorage.setItem("token", token);
-    localStorage.setItem("usuario", JSON.stringify(usuario));
-    return { token, usuario };
-  } catch (error: any) {
-    console.error("❌ Error al iniciar sesión:", error.message);
-    throw error;
-  }
+// ======== LOGIN / SESIÓN ========
+export async function loginUsuario(correo_electronico: string, contrasena: string) {
+  const res = await api.post("/login", { correo_electronico, contrasena });
+  const { token, usuario } = res.data;
+  localStorage.setItem("token", token);
+  localStorage.setItem("usuario", JSON.stringify(usuario));
+  return { token, usuario };
 }
 
-// ---------- ACTUALIZAR USUARIO ----------
-
-export async function updateUsuario(usuario_id: number, data: FormData): Promise<Usuario> {
-  const token = localStorage.getItem("token");
-  if (!token) throw new Error("No hay sesión activa");
-
-  try {
-    const res = await api.put(`/usuarios/${usuario_id}`, data, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return res.data;
-  } catch (error: any) {
-    console.error("❌ Error al actualizar usuario:", error);
-    throw error;
-  }
-}
-
-// ---------- CATEGORÍAS ----------
-
-export async function getCategorias(): Promise<any> {
-  try {
-    const res = await api.get("/categorias");
-    return res.data;
-  } catch (error: any) {
-    console.error("❌ Error al obtener categorías:", error.message);
-    throw error;
-  }
-}
-
-// ---------- LOGOUT ----------
-
-export function logoutUsuario(): void {
+export function logoutUsuario() {
   localStorage.removeItem("token");
   localStorage.removeItem("usuario");
 }
 
-// ---------- OPCIONAL: obtener usuario actual ----------
-
-export async function getUsuarioActual(): Promise<Usuario> {
-  const token = localStorage.getItem("token");
-  if (!token) throw new Error("No hay sesión activa");
-
-  try {
-    const res = await api.get("/me", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return res.data;
-  } catch (error: any) {
-    console.error("❌ Error al obtener usuario actual:", error.message);
-    throw error;
-  }
-}
-// ---------- PUBLICACIONES ----------
-export async function crearPublicacion(data: FormData): Promise<any> {
-  try {
-    const res = await api.post("/publicaciones", data, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-    return res.data;
-  } catch (error: any) {
-    console.error("❌ Error al crear publicación:", error.message);
-    throw error;
-  }
-}
-
-export async function getPublicaciones(): Promise<any[]> {
-  try {
-    const res = await api.get("/publicaciones");
-    return res.data;
-  } catch (error: any) {
-    console.error("❌ Error al obtener publicaciones:", error.message);
-    throw error;
-  }
-}
-
-// ---------- PERFILES ----------
+// ======== PERFILES ========
 export async function getPerfil(id_usuario: number) {
-  const res = await axios.get(`${API_URL}/perfiles/${id_usuario}`);
-  return res.data;
-}
-
-export async function crearPerfil(data: FormData) {
-  const res = await api.post(`/perfiles`, data);
-  return res.data;
-}
-
-export async function actualizarPerfil(id_usuario: number, data: FormData) {
-  const res = await axios.put(`${API_URL}/perfiles/${id_usuario}`, data, {
-    headers: { "Content-Type": "multipart/form-data" },
+  const res = await api.get(`/perfiles/${id_usuario}`, {
+    headers: { token: getToken() },
   });
   return res.data;
 }
 
+export async function actualizarPerfil(id_usuario: number, data: FormData) {
+  const res = await api.put(`/perfiles/${id_usuario}`, data, {
+    headers: { token: getToken(), "Content-Type": "multipart/form-data" },
+  });
+  return res.data;
+}
+
+// ======== PUBLICACIONES ========
+export async function crearPublicacion(data: FormData) {
+  const res = await api.post("/publicaciones", data, {
+    headers: { token: getToken(), "Content-Type": "multipart/form-data" },
+  });
+  return res.data;
+}
+
+export async function getPublicaciones() {
+  const res = await api.get("/publicaciones");
+  return res.data;
+}
+
+// ======== RELACIONES SOCIALES ========
+export async function seguirUsuario(id_seguido: number) {
+  const res = await api.post(`/seguir/${id_seguido}`, null, {
+    headers: {
+      token: getToken(),
+      id_usuario: getUsuarioId(),
+    },
+  });
+  return res.data;
+}
+
+export async function dejarDeSeguirUsuario(id_seguido: number) {
+  const res = await api.delete(`/dejar-seguir/${id_seguido}`, {
+    headers: {
+      token: getToken(),
+      id_usuario: getUsuarioId(),
+    },
+  });
+  return res.data;
+}
+
+export async function obtenerSeguidores() {
+  const res = await api.get("/seguidores", {
+    headers: { token: getToken(), id_usuario: getUsuarioId() },
+  });
+  return res.data;
+}
+
+// ======== AMISTADES ========
+export async function enviarSolicitudAmistad(id_receptor: number) {
+  const res = await api.post(`/amistad/${id_receptor}`, null, {
+    headers: { token: getToken(), id_usuario: getUsuarioId() },
+  });
+  return res.data;
+}
+
+export async function responderSolicitudAmistad(id_solicitud: number, estado: string) {
+  const formData = new FormData();
+  formData.append("estado", estado);
+  const res = await api.put(`/amistad/${id_solicitud}`, formData, {
+    headers: { token: getToken(), id_usuario: getUsuarioId() },
+  });
+  return res.data;
+}
+
+export async function obtenerSolicitudesPendientes() {
+  const res = await api.get("/solicitudes-amistad", {
+    headers: { token: getToken(), id_usuario: getUsuarioId() },
+  });
+  return res.data;
+}
+
+export async function obtenerAmigos() {
+  const res = await api.get("/amigos", {
+    headers: { token: getToken(), id_usuario: getUsuarioId() },
+  });
+  return res.data;
+}
+
+// ======== NOTIFICACIONES ========
+export async function getNotificaciones() {
+  const res = await api.get("/notificaciones", {
+    headers: { token: getToken(), id_usuario: getUsuarioId() },
+  });
+  return res.data;
+}
+
+// ======== REPORTAR USUARIO ========
+export async function reportarUsuario(id_reportado: number, motivo: string) {
+  const formData = new FormData();
+  formData.append("motivo", motivo);
+  const res = await api.post(`/reportar/${id_reportado}`, formData, {
+    headers: { token: getToken(), id_usuario: getUsuarioId() },
+  });
+  return res.data;
+}
+
+// ======== CATEGORÍAS ========
+export async function obtenerCategorias() {
+  const res = await api.get("/categorias");
+  return res.data;
+}
+
+// ======== ALIAS PARA COMPATIBILIDAD ========
+export const getSolicitudesAmistad = obtenerSolicitudesPendientes;
+export const getAmigos = obtenerAmigos;
+export const getCategorias = obtenerCategorias;

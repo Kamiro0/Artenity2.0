@@ -60,5 +60,12 @@ class PublicacionResponse(PublicacionBase):
     fecha_creacion: datetime
     usuario: UsuarioPerfil
 
+class NotificacionResponse(BaseModel):
+    id_notificacion: int
+    tipo: str
+    mensaje: str
+    fecha_creacion: datetime
+    leida: bool
+
     class Config:
         orm_mode = True

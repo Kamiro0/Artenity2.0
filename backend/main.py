@@ -6,6 +6,7 @@ from backend import models, database, schemas
 from backend.database import get_db
 from pydantic import BaseModel, EmailStr
 from typing import List
+from datetime import datetime
 import os
 
 app = FastAPI()
@@ -27,81 +28,49 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 # ------------------ Crear tablas ------------------
 models.Base.metadata.create_all(bind=database.engine)
 
-# ------------------ Dependencia para usuario actual ------------------
+
 def get_current_user_id(
-    token: str = Header(...),
+    token: str = Header(..., alias="token"),
+    user_id: int = Header(None, alias="id_usuario"),
     db: Session = Depends(get_db)
 ) -> int:
+    """
+    Autenticación simulada: usa token + id_usuario.
+    En producción, reemplazar por validación JWT.
+    """
+    if not token:
+        raise HTTPException(status_code=401, detail="Token requerido")
+
     if token != "fake-token":
         raise HTTPException(status_code=401, detail="Token inválido")
 
-    usuario = db.query(models.Usuario).first()  # Simulación de usuario
+    if not user_id:
+        raise HTTPException(status_code=400, detail="ID de usuario no proporcionado")
+
+    usuario = db.query(models.Usuario).filter(models.Usuario.id_usuario == user_id).first()
     if not usuario:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
     return usuario.id_usuario
 
 
-# ------------------ Función para crear perfiles faltantes ------------------
-def crear_perfiles_automaticos(db: Session):
-    """
-    Recorre todos los usuarios y crea perfiles vacíos
-    si alguno no tiene perfil asociado.
-    """
-    usuarios = db.query(models.Usuario).all()
-    for usuario in usuarios:
-        perfil_existente = db.query(models.Perfil).filter(models.Perfil.id_usuario == usuario.id_usuario).first()
-        if not perfil_existente:
-            nuevo_perfil = models.Perfil(
-                id_usuario=usuario.id_usuario,
-                descripcion=None,
-                biografia=None,
-                foto_perfil=None
-            )
-            db.add(nuevo_perfil)
-            print(f"✅ Perfil creado para usuario {usuario.id_usuario}")
-        else:
-            print(f"➡️ Perfil ya existe para usuario {usuario.id_usuario}")
-    db.commit()
-
-
-# ------------------ Endpoints Usuarios ------------------
+# ------------------ USUARIOS ------------------
 @app.post("/usuarios", response_model=schemas.UsuarioResponse)
 def create_usuario(usuario: schemas.UsuarioCreate, db: Session = Depends(get_db)):
-    nuevo_usuario = models.Usuario(
-        nombre=usuario.nombre,
-        apellido=usuario.apellido,
-        correo_electronico=usuario.correo_electronico,
-        contrasena=usuario.contrasena,
-        fecha_nacimiento=usuario.fecha_nacimiento,
-        genero=usuario.genero,
-        tipo_arte_preferido=usuario.tipo_arte_preferido,
-        telefono=usuario.telefono,
-        nombre_usuario=usuario.nombre_usuario
-    )
+    nuevo_usuario = models.Usuario(**usuario.dict())
     db.add(nuevo_usuario)
     db.commit()
     db.refresh(nuevo_usuario)
 
-    # Crear perfil vacío automáticamente
-    nuevo_perfil = models.Perfil(
-        id_usuario=nuevo_usuario.id_usuario,
-        descripcion=None,
-        biografia=None,
-        foto_perfil=None
-    )
+    nuevo_perfil = models.Perfil(id_usuario=nuevo_usuario.id_usuario)
     db.add(nuevo_perfil)
     db.commit()
-    db.refresh(nuevo_perfil)
 
     return nuevo_usuario
 
-
 @app.get("/usuarios", response_model=List[schemas.UsuarioResponse])
 def get_usuarios(db: Session = Depends(get_db)):
-    usuarios = db.query(models.Usuario).all()
-    return [u for u in usuarios if "@" in u.correo_electronico]
-
+    return db.query(models.Usuario).all()
 
 @app.delete("/usuarios/{usuario_id}", response_model=schemas.UsuarioResponse)
 def delete_usuario(usuario_id: int, db: Session = Depends(get_db)):
@@ -115,16 +84,16 @@ def delete_usuario(usuario_id: int, db: Session = Depends(get_db)):
     db.commit()
     return usuario
 
-
-# ------------------ Login ------------------
+# ------------------ LOGIN ------------------
 class LoginRequest(BaseModel):
     correo_electronico: EmailStr
     contrasena: str
 
-
 @app.post("/login")
 def login(data: LoginRequest, db: Session = Depends(get_db)):
-    usuario = db.query(models.Usuario).filter(models.Usuario.correo_electronico == data.correo_electronico).first()
+    usuario = db.query(models.Usuario).filter(
+        models.Usuario.correo_electronico == data.correo_electronico
+    ).first()
     if not usuario or usuario.contrasena != data.contrasena:
         raise HTTPException(status_code=400, detail="Credenciales incorrectas")
 
@@ -141,56 +110,25 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
             "tipo_arte_preferido": usuario.tipo_arte_preferido,
             "telefono": usuario.telefono,
             "nombre_usuario": usuario.nombre_usuario,
-            "foto_perfil": perfil.foto_perfil if perfil else None
+            "perfil": {
+                "descripcion": perfil.descripcion if perfil else None,
+                "biografia": perfil.biografia if perfil else None,
+                "foto_perfil": perfil.foto_perfil if perfil else None
+            }
         }
     }
 
-
-@app.put("/usuarios/{usuario_id}", response_model=schemas.UsuarioResponse)
-def update_usuario(
-    usuario_id: int,
-    nombre: str = Form(None),
-    correo_electronico: str = Form(None),
-    db: Session = Depends(get_db)
-):
-    usuario = db.query(models.Usuario).filter(models.Usuario.id_usuario == usuario_id).first()
-    if not usuario:
-        raise HTTPException(status_code=404, detail="Usuario no encontrado")
-
-    if nombre:
-        usuario.nombre = nombre
-    if correo_electronico:
-        usuario.correo_electronico = correo_electronico
-
-    db.commit()
-    db.refresh(usuario)
-    return usuario
-
-
 # ------------------ PERFILES ------------------
-# En main.py, actualiza el endpoint de obtener perfil:
 @app.get("/perfiles/{id_usuario}", response_model=schemas.PerfilResponse)
 def obtener_perfil(id_usuario: int, db: Session = Depends(get_db)):
-    perfil = (
-        db.query(models.Perfil)
-        .filter(models.Perfil.id_usuario == id_usuario)
-        .first()
-    )
+    perfil = db.query(models.Perfil).filter(models.Perfil.id_usuario == id_usuario).first()
     if not perfil:
-        # Crear perfil automáticamente si no existe
-        nuevo_perfil = models.Perfil(
-            id_usuario=id_usuario,
-            descripcion=None,
-            biografia=None,
-            foto_perfil=None
-        )
-        db.add(nuevo_perfil)
+        perfil = models.Perfil(id_usuario=id_usuario)
+        db.add(perfil)
         db.commit()
-        db.refresh(nuevo_perfil)
-        return nuevo_perfil
+        db.refresh(perfil)
     return perfil
 
-# Mejora el endpoint de actualizar perfil:
 @app.put("/perfiles/{id_usuario}", response_model=schemas.PerfilResponse)
 async def actualizar_perfil(
     id_usuario: int,
@@ -200,34 +138,24 @@ async def actualizar_perfil(
     db: Session = Depends(get_db)
 ):
     perfil = db.query(models.Perfil).filter(models.Perfil.id_usuario == id_usuario).first()
-    
     if not perfil:
-        # Crear perfil si no existe
         perfil = models.Perfil(id_usuario=id_usuario)
         db.add(perfil)
         db.commit()
         db.refresh(perfil)
 
-    if descripcion is not None:
+    if descripcion:
         perfil.descripcion = descripcion
-    if biografia is not None:
+    if biografia:
         perfil.biografia = biografia
-        
+
     if file and file.filename:
-        # Asegurar que la carpeta existe
         os.makedirs("static/perfiles", exist_ok=True)
-        
-        # Generar nombre único para el archivo
-        file_extension = file.filename.split('.')[-1]
-        filename = f"perfil_{id_usuario}.{file_extension}"
-        file_path = os.path.join("static/perfiles", filename)
-        
-        # Guardar archivo
-        with open(file_path, "wb") as buffer:
-            content = await file.read()
-            buffer.write(content)
-        
-        # Actualizar URL en la base de datos
+        ext = file.filename.split(".")[-1]
+        filename = f"perfil_{id_usuario}.{ext}"
+        ruta = os.path.join("static/perfiles", filename)
+        with open(ruta, "wb") as f:
+            f.write(await file.read())
         perfil.foto_perfil = f"http://localhost:8000/static/perfiles/{filename}"
 
     db.commit()
@@ -237,14 +165,9 @@ async def actualizar_perfil(
 # ------------------ PUBLICACIONES ------------------
 @app.get("/publicaciones", response_model=List[schemas.PublicacionResponse])
 def obtener_publicaciones(db: Session = Depends(get_db)):
-    publicaciones = (
-        db.query(models.Publicacion)
-        .options(joinedload(models.Publicacion.usuario).joinedload(models.Usuario.perfil))
-        .order_by(models.Publicacion.fecha_creacion.desc())
-        .all()
-    )
-    return publicaciones
-
+    return db.query(models.Publicacion)\
+        .options(joinedload(models.Publicacion.usuario).joinedload(models.Usuario.perfil))\
+        .order_by(models.Publicacion.fecha_creacion.desc()).all()
 
 @app.post("/publicaciones", response_model=schemas.PublicacionResponse)
 async def crear_publicacion(
@@ -255,33 +178,131 @@ async def crear_publicacion(
 ):
     imagen_url = None
     if file:
+        os.makedirs("static/posts", exist_ok=True)
         filename = f"{id_usuario}_{file.filename}"
         ruta = os.path.join("static/posts", filename)
         with open(ruta, "wb") as f:
-            f.write(file.file.read())
+            f.write(await file.read())
         imagen_url = f"http://localhost:8000/static/posts/{filename}"
 
-    nueva_pub = models.Publicacion(
-        id_usuario=id_usuario,
-        contenido=contenido,
-        imagen=imagen_url
-    )
+    nueva_pub = models.Publicacion(id_usuario=id_usuario, contenido=contenido, imagen=imagen_url)
     db.add(nueva_pub)
     db.commit()
     db.refresh(nueva_pub)
     return nueva_pub
 
+# ------------------ SEGUIR USUARIO ------------------
+@app.post("/seguir/{id_seguido}")
+def seguir_usuario(
+    id_seguido: int,
+    db: Session = Depends(get_db),
+    user_id: int = Depends(get_current_user_id)
+):
+    if id_seguido == user_id:
+        raise HTTPException(status_code=400, detail="No puedes seguirte a ti mismo")
 
-# ------------------ Home ------------------
+    existente = db.query(models.SeguirUsuario).filter(
+        models.SeguirUsuario.id_seguidor == user_id,
+        models.SeguirUsuario.id_seguido == id_seguido
+    ).first()
+
+    if existente:
+        raise HTTPException(status_code=400, detail="Ya sigues a este usuario")
+
+    nuevo = models.SeguirUsuario(id_seguidor=user_id, id_seguido=id_seguido)
+    db.add(nuevo)
+    db.commit()
+    db.refresh(nuevo)
+
+    seguidor = db.query(models.Usuario).filter(models.Usuario.id_usuario == user_id).first()
+    noti = models.Notificacion(
+        id_usuario=id_seguido,
+        tipo="nuevo_seguidor",
+        mensaje=f"{seguidor.nombre_usuario} comenzó a seguirte",
+        id_referencia=nuevo.id_seguimiento
+    )
+    db.add(noti)
+    db.commit()
+    return {"mensaje": "Ahora sigues a este usuario"}
+# ------------------ DEJAR DE SEGUIR ------------------
+@app.delete("/dejar-seguir/{id_seguido}")
+def dejar_de_seguir(
+    id_seguido: int,
+    db: Session = Depends(get_db),
+    user_id: int = Depends(get_current_user_id)
+):
+    if id_seguido == user_id:
+        raise HTTPException(status_code=400, detail="No puedes dejar de seguirte a ti mismo")
+
+    seguir = db.query(models.SeguirUsuario).filter(
+        models.SeguirUsuario.id_seguidor == user_id,
+        models.SeguirUsuario.id_seguido == id_seguido
+    ).first()
+
+    if not seguir:
+        raise HTTPException(status_code=404, detail="No sigues a este usuario")
+
+    db.delete(seguir)
+    db.commit()
+    return {"mensaje": "Has dejado de seguir a este usuario"}
+
+# ------------------ SEGUIDORES ------------------
+@app.get("/seguidores")
+def obtener_seguidores(db: Session = Depends(get_db), user_id: int = Depends(get_current_user_id)):
+    seguidores = db.query(models.SeguirUsuario).filter(models.SeguirUsuario.id_seguido == user_id).all()
+
+    resultado = []
+    for seg in seguidores:
+        seguidor = db.query(models.Usuario).filter(models.Usuario.id_usuario == seg.id_seguidor).first()
+        perfil = db.query(models.Perfil).filter(models.Perfil.id_usuario == seg.id_seguidor).first()
+        resultado.append({
+            "id_seguimiento": seg.id_seguimiento,
+            "fecha_seguimiento": seg.fecha_seguimiento,
+            "seguidor": {
+                "id_usuario": seguidor.id_usuario,
+                "nombre_usuario": seguidor.nombre_usuario,
+                "foto_perfil": perfil.foto_perfil if perfil else None
+            }
+        })
+    return resultado
+
+# ------------------ NOTIFICACIONES ------------------
+@app.get("/notificaciones", response_model=List[schemas.NotificacionResponse])
+def obtener_notificaciones(db: Session = Depends(get_db), user_id: int = Depends(get_current_user_id)):
+    notificaciones = (
+        db.query(models.Notificacion)
+        .filter(models.Notificacion.id_usuario == user_id)
+        .order_by(models.Notificacion.fecha.desc())
+        .all()
+    )
+
+    return [
+        {
+            "id_notificacion": n.id_notificacion,
+            "tipo": n.tipo,
+            "mensaje": n.mensaje,
+            "fecha_creacion": n.fecha,
+            "leida": n.leido,
+            "id_referencia": getattr(n, "id_referencia", None)
+        }
+        for n in notificaciones
+    ]
+
+@app.put("/notificaciones/{id_notificacion}/leer")
+def marcar_notificacion_leida(id_notificacion: int, db: Session = Depends(get_db), user_id: int = Depends(get_current_user_id)):
+    noti = db.query(models.Notificacion).filter(
+        models.Notificacion.id_notificacion == id_notificacion,
+        models.Notificacion.id_usuario == user_id
+    ).first()
+
+    if not noti:
+        raise HTTPException(status_code=404, detail="Notificación no encontrada")
+
+    noti.leido = True
+    db.commit()
+    return {"mensaje": "Notificación marcada como leída"}
+
+# ------------------ HOME ------------------
 @app.get("/home")
 def home():
-    return {
-        "contenido": """
-            <div>Barra de navegación</div>
-            <div>Publicaciones</div>
-            <div>Categorías</div>
-            <div>Sugerencias</div>
-            <div>Pintura</div>
-            <div>homeuser</div>
-        """
-    }
+    return {"contenido": "<div>Barra de navegación</div><div>Publicaciones</div><div>Categorías</div><div>Sugerencias</div>"}
