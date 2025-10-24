@@ -274,3 +274,17 @@
 .usuario-nombre {
   font-weight: 500;
 }
+.btn-eliminar-amigo {
+  background: transparent;
+  border: none;
+  color: #ff5c5c;
+  font-size: 1.2rem;
+  margin-left: 8px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.btn-eliminar-amigo:hover {
+  color: #ff2a2a;
+  transform: scale(1.1);
+}

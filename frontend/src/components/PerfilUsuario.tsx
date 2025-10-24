@@ -22,6 +22,7 @@ export default function PerfilUsuario() {
   const [reporteModal, setReporteModal] = useState(false);
   const [motivoReporte, setMotivoReporte] = useState("");
   const [amigos, setAmigos] = useState<any[]>([]);
+  const esAmigo = perfil ? amigos.some(a => a.id_usuario === perfil.id_usuario) : false;
 
   useEffect(() => {
     if (id) {
@@ -139,9 +140,15 @@ const handleDejarSeguir = async () => {
              👣 Seguir
             </button>
              )}
-              <button onClick={handleSolicitudAmistad} className="btn-amistad">
-                🤝 Enviar solicitud
-              </button>
+
+            <button 
+             onClick={handleSolicitudAmistad} 
+             className="btn-amistad"
+              disabled={esAmigo}
+              >
+             🤝 {esAmigo ? "Ya son amigos" : "Enviar solicitud"}
+            </button>
+
               <button 
                 onClick={() => setReporteModal(true)} 
                 className="btn-reportar"

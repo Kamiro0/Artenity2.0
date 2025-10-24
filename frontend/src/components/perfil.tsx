@@ -8,6 +8,7 @@ import {
   getAmigos,
   obtenerSeguidores,
 } from "../services/api";
+import { eliminarAmigo } from "../services/api";
 import "../styles/perfil.css";
 
 const Perfil: React.FC = () => {
@@ -195,12 +196,30 @@ const Perfil: React.FC = () => {
             amigos.map((amigo) => (
               <div key={amigo.id_usuario} className="usuario-item">
                 <img
-                  src={amigo.perfil?.foto_perfil || defaultProfile}
+                 src={amigo.foto_perfil || defaultProfile}
                   alt=""
                   className="usuario-foto"
                 />
                 <span className="usuario-nombre">
                   {amigo.nombre_usuario}
+                  {/* 🗑️ Botón eliminar amigo */}
+      <button
+        className="btn-eliminar-amigo"
+        onClick={async () => {
+          if (window.confirm(`¿Eliminar a ${amigo.nombre_usuario}?`)) {
+            try {
+              await eliminarAmigo(amigo.id_usuario);
+              setAmigos(amigos.filter((a) => a.id_usuario !== amigo.id_usuario));
+              alert("Amigo eliminado correctamente.");
+            } catch (error) {
+              alert("Error al eliminar amigo.");
+              console.error(error);
+            }
+          }
+        }}
+      >
+        ❌
+      </button>
                 </span>
               </div>
             ))

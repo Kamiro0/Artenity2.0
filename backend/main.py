@@ -290,6 +290,173 @@ def obtener_seguidores(db: Session = Depends(get_db), user_id: int = Depends(get
             }
         })
     return resultado
+# ------------------ SOLICITUDES DE AMISTAD ------------------
+@app.post("/amistad/{id_receptor}")
+def enviar_solicitud_amistad(
+    id_receptor: int,
+    db: Session = Depends(get_db),
+    user_id: int = Depends(get_current_user_id)
+):
+    if id_receptor == user_id:
+        raise HTTPException(status_code=400, detail="No puedes enviarte una solicitud a ti mismo")
+
+    # 🔹 1. Revisar si ya son amigos
+    ya_amigos = db.query(models.SolicitudAmistad).filter(
+        ((models.SolicitudAmistad.id_emisor == user_id) & (models.SolicitudAmistad.id_receptor == id_receptor)) |
+        ((models.SolicitudAmistad.id_emisor == id_receptor) & (models.SolicitudAmistad.id_receptor == user_id)),
+        models.SolicitudAmistad.estado == "aceptada"
+    ).first()
+
+    if ya_amigos:
+        raise HTTPException(status_code=400, detail="Ya son amigos, no puedes enviar otra solicitud")
+
+    # 🔹 2. Revisar si hay una solicitud pendiente
+    existente = db.query(models.SolicitudAmistad).filter(
+        ((models.SolicitudAmistad.id_emisor == user_id) & (models.SolicitudAmistad.id_receptor == id_receptor)) |
+        ((models.SolicitudAmistad.id_emisor == id_receptor) & (models.SolicitudAmistad.id_receptor == user_id)),
+        models.SolicitudAmistad.estado == "pendiente"
+    ).first()
+
+    if existente:
+        raise HTTPException(status_code=400, detail="Ya existe una solicitud pendiente entre ustedes")
+
+    # 🔹 3. Crear nueva solicitud si no hay amistad ni solicitud pendiente
+    nueva = models.SolicitudAmistad(id_emisor=user_id, id_receptor=id_receptor)
+    db.add(nueva)
+    db.commit()
+    db.refresh(nueva)
+
+    # 🔹 4. Crear notificación al receptor
+    emisor = db.query(models.Usuario).filter(models.Usuario.id_usuario == user_id).first()
+    noti = models.Notificacion(
+        id_usuario=id_receptor,
+        tipo="solicitud_amistad",
+        mensaje=f"{emisor.nombre_usuario} te ha enviado una solicitud de amistad",
+        id_referencia=nueva.id_solicitud
+    )
+    db.add(noti)
+    db.commit()
+
+    return {"mensaje": "Solicitud de amistad enviada", "id_solicitud": nueva.id_solicitud}
+
+
+@app.get("/solicitudes-amistad")
+def obtener_solicitudes_pendientes(
+    db: Session = Depends(get_db),
+    user_id: int = Depends(get_current_user_id)
+):
+    solicitudes = db.query(models.SolicitudAmistad)\
+        .filter(models.SolicitudAmistad.id_receptor == user_id)\
+        .filter(models.SolicitudAmistad.estado == "pendiente")\
+        .all()
+
+    resultado = []
+    for s in solicitudes:
+        emisor = db.query(models.Usuario).filter(models.Usuario.id_usuario == s.id_emisor).first()
+        perfil = db.query(models.Perfil).filter(models.Perfil.id_usuario == s.id_emisor).first()
+        resultado.append({
+            "id_solicitud": s.id_solicitud,
+            "fecha_envio": s.fecha_envio,
+            "estado": s.estado,
+            "emisor": {
+                "id_usuario": emisor.id_usuario,
+                "nombre_usuario": emisor.nombre_usuario,
+                "foto_perfil": perfil.foto_perfil if perfil else None
+            }
+        })
+    return resultado
+
+
+@app.put("/amistad/{id_solicitud}")
+def responder_solicitud_amistad(
+    id_solicitud: int,
+    estado: str = Form(...),
+    db: Session = Depends(get_db),
+    user_id: int = Depends(get_current_user_id)
+):
+    solicitud = db.query(models.SolicitudAmistad).filter(models.SolicitudAmistad.id_solicitud == id_solicitud).first()
+    if not solicitud:
+        raise HTTPException(status_code=404, detail="Solicitud no encontrada")
+
+    if solicitud.id_receptor != user_id:
+        raise HTTPException(status_code=403, detail="No puedes responder solicitudes que no son tuyas")
+
+    if solicitud.estado != "pendiente":
+        raise HTTPException(status_code=400, detail="Esta solicitud ya fue respondida")
+
+    if estado not in ["aceptada", "rechazada"]:
+        raise HTTPException(status_code=400, detail="Estado inválido")
+
+    solicitud.estado = estado
+    db.commit()
+    db.refresh(solicitud)
+
+    # Crear notificación al emisor
+    receptor = db.query(models.Usuario).filter(models.Usuario.id_usuario == user_id).first()
+    noti_msg = (
+        f"{receptor.nombre_usuario} aceptó tu solicitud de amistad"
+        if estado == "aceptada"
+        else f"{receptor.nombre_usuario} rechazó tu solicitud de amistad"
+    )
+    noti = models.Notificacion(
+        id_usuario=solicitud.id_emisor,
+        tipo=f"amistad_{estado}",
+        mensaje=noti_msg,
+        id_referencia=solicitud.id_solicitud
+    )
+    db.add(noti)
+    db.commit()
+
+    return {"mensaje": f"Solicitud {estado} correctamente"}
+
+
+@app.get("/amigos")
+def obtener_amigos(
+    db: Session = Depends(get_db),
+    user_id: int = Depends(get_current_user_id)
+):
+    solicitudes = db.query(models.SolicitudAmistad).filter(
+        ((models.SolicitudAmistad.id_emisor == user_id) | (models.SolicitudAmistad.id_receptor == user_id)) &
+        (models.SolicitudAmistad.estado == "aceptada")
+    ).all()
+
+    amigos = []
+    for s in solicitudes:
+        amigo_id = s.id_emisor if s.id_receptor == user_id else s.id_receptor
+        amigo = db.query(models.Usuario).filter(models.Usuario.id_usuario == amigo_id).first()
+        perfil = db.query(models.Perfil).filter(models.Perfil.id_usuario == amigo_id).first()
+        amigos.append({
+            "id_usuario": amigo.id_usuario,
+            "nombre_usuario": amigo.nombre_usuario,
+            "foto_perfil": perfil.foto_perfil if perfil else None
+        })
+    return amigos
+
+# ------------------ ELIMINAR AMIGO ------------------
+@app.delete("/amigos/{id_amigo}")
+def eliminar_amigo(
+    id_amigo: int,
+    db: Session = Depends(get_db),
+    user_id: int = Depends(get_current_user_id)
+):
+    """
+    Elimina la relación de amistad entre el usuario actual y otro usuario (id_amigo).
+    """
+    solicitud = db.query(models.SolicitudAmistad).filter(
+        (
+            ((models.SolicitudAmistad.id_emisor == user_id) & (models.SolicitudAmistad.id_receptor == id_amigo)) |
+            ((models.SolicitudAmistad.id_emisor == id_amigo) & (models.SolicitudAmistad.id_receptor == user_id))
+        ) &
+        (models.SolicitudAmistad.estado == "aceptada")
+    ).first()
+
+    if not solicitud:
+        raise HTTPException(status_code=404, detail="No existe relación de amistad con este usuario")
+
+    db.delete(solicitud)
+    db.commit()
+
+    return {"mensaje": f"Has eliminado a {id_amigo} de tu lista de amigos"}
 
 # ------------------ NOTIFICACIONES ------------------
 @app.get("/notificaciones", response_model=List[schemas.NotificacionResponse])

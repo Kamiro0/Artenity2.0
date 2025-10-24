@@ -106,7 +106,7 @@ export default function NotificacionesPanel({ usuario }: { usuario: any }) {
               {solicitudesPendientes.map((s) => (
                 <div key={s.id_solicitud} className="solicitud-item">
                   <img
-                    src={s.emisor?.perfil?.foto_perfil || defaultProfile}
+                    src={s.emisor?.foto_perfil || defaultProfile}
                     alt="perfil"
                     className="foto-perfil-pequena"
                   />
@@ -114,18 +114,8 @@ export default function NotificacionesPanel({ usuario }: { usuario: any }) {
                     <strong>{s.emisor?.nombre_usuario}</strong> te envió una solicitud
                   </p>
                   <div>
-                    <button
-                      onClick={() => handleResponder(s.id_solicitud, "aceptada")}
-                      className="btn-aceptar"
-                    >
-                      ✓
-                    </button>
-                    <button
-                      onClick={() => handleResponder(s.id_solicitud, "rechazada")}
-                      className="btn-rechazar"
-                    >
-                      ✗
-                    </button>
+                  <button onClick={() => handleResponder(s.id_solicitud, "aceptada")}>Aceptar</button>
+                  <button onClick={() => handleResponder(s.id_solicitud, "rechazada")}>Rechazar</button>
                   </div>
                 </div>
               ))}

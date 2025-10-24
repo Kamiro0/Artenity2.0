@@ -126,8 +126,13 @@ export async function enviarSolicitudAmistad(id_receptor: number) {
 export async function responderSolicitudAmistad(id_solicitud: number, estado: string) {
   const formData = new FormData();
   formData.append("estado", estado);
+
   const res = await api.put(`/amistad/${id_solicitud}`, formData, {
-    headers: { token: getToken(), id_usuario: getUsuarioId() },
+    headers: {
+      token: getToken(),
+      id_usuario: getUsuarioId(),
+      "Content-Type": "multipart/form-data", // 🔹 importante
+    },
   });
   return res.data;
 }
@@ -145,6 +150,21 @@ export async function obtenerAmigos() {
   });
   return res.data;
 }
+ 
+// ======== ELIMINAR AMIGO ========
+export const eliminarAmigo = async (id_amigo: number) => {
+  try {
+    const token = localStorage.getItem("token");
+    const id_usuario = JSON.parse(localStorage.getItem("usuario") || "{}").id_usuario;
+    const response = await axios.delete(`${API_URL}/amigos/${id_amigo}`, {
+      headers: { token, id_usuario },
+    });
+    return response.data;
+  } catch (error: any) {
+    console.error("Error eliminando amigo:", error);
+    throw error.response?.data || { detail: "Error al eliminar amigo" };
+  }
+};
 
 // ======== NOTIFICACIONES ========
 export async function getNotificaciones() {
