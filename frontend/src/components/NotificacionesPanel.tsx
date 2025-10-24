@@ -1,10 +1,10 @@
-// ✅ components/NotificacionesPanel.tsx
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   getNotificaciones,
   responderSolicitudAmistad,
   obtenerSolicitudesPendientes as getSolicitudesAmistad,
-  obtenerSeguidores
+  obtenerSeguidores,
+  marcarNotificacionesLeidas,
 } from "../services/api";
 import defaultProfile from "../assets/img/fotoperfildefault.jpg";
 import "../styles/notificaciones.css";
@@ -13,25 +13,28 @@ export default function NotificacionesPanel({ usuario }: { usuario: any }) {
   const [notificaciones, setNotificaciones] = useState<any[]>([]);
   const [solicitudesPendientes, setSolicitudesPendientes] = useState<any[]>([]);
   const [seguidores, setSeguidores] = useState<any[]>([]);
+  const [mostrarPanel, setMostrarPanel] = useState(false);
+  const [cantidadNoLeidas, setCantidadNoLeidas] = useState(0);
+
+  // ✅ Cargar todo (notificaciones, solicitudes, seguidores)
+  const cargarTodo = useCallback(async () => {
+    await Promise.all([cargarNotificaciones(), cargarSolicitudes(), cargarSeguidores()]);
+  }, []);
 
   useEffect(() => {
     if (usuario?.id_usuario) {
       cargarTodo();
     }
-  }, [usuario]);
-
-  const cargarTodo = async () => {
-    await Promise.all([
-      cargarNotificaciones(),
-      cargarSolicitudes(),
-      cargarSeguidores()
-    ]);
-  };
+  }, [usuario, cargarTodo]);
 
   const cargarNotificaciones = async () => {
     try {
       const data = await getNotificaciones();
       setNotificaciones(data);
+
+      // 🔢 Calcular cantidad no leídas directamente
+      const noLeidas = data.filter((n: any) => !n.leida).length;
+      setCantidadNoLeidas(noLeidas);
     } catch (err) {
       console.error("Error cargando notificaciones:", err);
     }
@@ -64,73 +67,111 @@ export default function NotificacionesPanel({ usuario }: { usuario: any }) {
     }
   };
 
+  // ✅ Marcar como leídas al abrir el panel
+  const togglePanel = async () => {
+    const nuevoEstado = !mostrarPanel;
+    setMostrarPanel(nuevoEstado);
+
+    if (nuevoEstado) {
+      try {
+        await marcarNotificacionesLeidas(); // backend actualiza el estado
+        await cargarNotificaciones(); // refresca lista
+        setCantidadNoLeidas(0); // contador a 0 inmediatamente
+      } catch (err) {
+        console.error("Error al marcar como leídas:", err);
+      }
+    }
+  };
+
   return (
-    <div className="notificaciones-panel">
-      <h3>🔔 Notificaciones</h3>
-
-      {/* 🧡 Solicitudes de Amistad */}
-      {solicitudesPendientes.length > 0 && (
-        <section className="solicitudes-section">
-          <h4>Solicitudes de amistad</h4>
-          {solicitudesPendientes.map((s) => (
-            <div key={s.id_solicitud} className="solicitud-item">
-              <img
-                src={s.emisor?.perfil?.foto_perfil || defaultProfile}
-                alt="perfil"
-                className="foto-perfil-pequena"
-              />
-              <p>
-                <strong>{s.emisor?.nombre_usuario}</strong> te envió una solicitud
-              </p>
-              <div className="acciones-solicitud">
-                <button onClick={() => handleResponder(s.id_solicitud, "aceptada")} className="btn-aceptar">
-                  ✓ Aceptar
-                </button>
-                <button onClick={() => handleResponder(s.id_solicitud, "rechazada")} className="btn-rechazar">
-                  ✗ Rechazar
-                </button>
-              </div>
-            </div>
-          ))}
-        </section>
-      )}
-
-      {/* 🧍‍♂️ Seguidores */}
-      {seguidores.length > 0 && (
-        <section className="seguidores-section">
-          <h4>Personas que te siguen</h4>
-          {seguidores.map((seg) => (
-            <div key={seg.id_seguimiento} className="seguidor-item">
-              <img
-                src={seg.seguidor?.foto_perfil || defaultProfile}
-                alt="perfil"
-                className="foto-perfil-pequena"
-              />
-              <p>
-                <strong>{seg.seguidor?.nombre_usuario}</strong> comenzó a seguirte
-              </p>
-              <span className="fecha">
-                {new Date(seg.fecha_seguimiento).toLocaleDateString()}
-              </span>
-            </div>
-          ))}
-        </section>
-      )}
-
-      {/* 📨 Notificaciones generales */}
-      <section className="notificaciones-list">
-        <h4>Otras notificaciones</h4>
-        {notificaciones.length > 0 ? (
-          notificaciones.map((n) => (
-            <div key={n.id_notificacion} className={`notificacion ${n.leido ? "leida" : "no-leida"}`}>
-              <p>{n.mensaje}</p>
-              <span className="fecha">{new Date(n.fecha_creacion).toLocaleString()}</span>
-            </div>
-          ))
-        ) : (
-          <p className="sin-notificaciones">No hay notificaciones recientes</p>
+    <div style={{ position: "relative" }}>
+      {/* 🔔 Icono con contador */}
+      <div className="notificacion-icon" onClick={togglePanel}>
+        <span style={{ fontSize: "1.6rem" }}>🔔</span>
+        {cantidadNoLeidas > 0 && (
+          <span className="notificacion-badge">
+            {cantidadNoLeidas > 9 ? "9+" : cantidadNoLeidas}
+          </span>
         )}
-      </section>
+      </div>
+
+      {mostrarPanel && (
+        <div className="notificaciones-panel">
+          <h3>Notificaciones</h3>
+
+          {/* 🧡 Solicitudes de Amistad */}
+          {solicitudesPendientes.length > 0 && (
+            <section>
+              <h4>Solicitudes de amistad</h4>
+              {solicitudesPendientes.map((s) => (
+                <div key={s.id_solicitud} className="solicitud-item">
+                  <img
+                    src={s.emisor?.perfil?.foto_perfil || defaultProfile}
+                    alt="perfil"
+                    className="foto-perfil-pequena"
+                  />
+                  <p>
+                    <strong>{s.emisor?.nombre_usuario}</strong> te envió una solicitud
+                  </p>
+                  <div>
+                    <button
+                      onClick={() => handleResponder(s.id_solicitud, "aceptada")}
+                      className="btn-aceptar"
+                    >
+                      ✓
+                    </button>
+                    <button
+                      onClick={() => handleResponder(s.id_solicitud, "rechazada")}
+                      className="btn-rechazar"
+                    >
+                      ✗
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </section>
+          )}
+
+          {/* 🧍 Seguidores */}
+          {seguidores.length > 0 && (
+            <section>
+              <h4>Personas que te siguen</h4>
+              {seguidores.map((seg) => (
+                <div key={seg.id_seguimiento} className="seguidor-item">
+                  <img
+                    src={seg.seguidor?.foto_perfil || defaultProfile}
+                    alt="perfil"
+                    className="foto-perfil-pequena"
+                  />
+                  <p>
+                    <strong>{seg.seguidor?.nombre_usuario}</strong> comenzó a seguirte
+                  </p>
+                </div>
+              ))}
+            </section>
+          )}
+
+          {/* 📨 Otras notificaciones */}
+          <section>
+            <h4>Otras notificaciones</h4>
+            {notificaciones.length > 0 ? (
+              notificaciones.map((n) => (
+                <div
+                  key={n.id_notificacion}
+                  className={`notificacion ${n.leida ? "leida" : "no-leida"}`}
+                >
+                  <p>{n.mensaje}</p>
+                  <span className="fecha">
+                    {new Date(n.fecha_creacion).toLocaleString()}
+                  </span>
+                </div>
+              ))
+            ) : (
+              <p className="sin-notificaciones">No hay notificaciones recientes</p>
+            )}
+          </section>
+        </div>
+      )}
     </div>
   );
 }

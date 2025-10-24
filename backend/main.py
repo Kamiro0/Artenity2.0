@@ -312,20 +312,23 @@ def obtener_notificaciones(db: Session = Depends(get_db), user_id: int = Depends
         }
         for n in notificaciones
     ]
+    
+@app.put("/notificaciones/leidas")
+def marcar_notificaciones_leidas(
+    db: Session = Depends(database.get_db),
+    user_id: int = Depends(get_current_user_id)
+):
+    notificaciones = db.query(models.Notificacion).filter(
+        models.Notificacion.id_usuario == user_id,
+        models.Notificacion.leido == False
+    ).all()
 
-@app.put("/notificaciones/{id_notificacion}/leer")
-def marcar_notificacion_leida(id_notificacion: int, db: Session = Depends(get_db), user_id: int = Depends(get_current_user_id)):
-    noti = db.query(models.Notificacion).filter(
-        models.Notificacion.id_notificacion == id_notificacion,
-        models.Notificacion.id_usuario == user_id
-    ).first()
+    for n in notificaciones:
+        n.leido = True
 
-    if not noti:
-        raise HTTPException(status_code=404, detail="Notificación no encontrada")
-
-    noti.leido = True
     db.commit()
-    return {"mensaje": "Notificación marcada como leída"}
+    return {"mensaje": f"{len(notificaciones)} notificaciones marcadas como leídas"}
+
 
 # ------------------ HOME ------------------
 @app.get("/home")

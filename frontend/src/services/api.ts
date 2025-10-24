@@ -153,6 +153,16 @@ export async function getNotificaciones() {
   });
   return res.data;
 }
+// ======== NOTIFICACIONES ========
+export async function marcarNotificacionesLeidas() {
+  const res = await api.put(
+    "/notificaciones/leidas",
+    {},
+    { headers: { token: getToken(), id_usuario: getUsuarioId() } }
+  );
+  return res.data;
+}
+
 
 // ======== REPORTAR USUARIO ========
 export async function reportarUsuario(id_reportado: number, motivo: string) {

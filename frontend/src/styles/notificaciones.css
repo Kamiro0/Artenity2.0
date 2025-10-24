@@ -3,7 +3,9 @@
   position: absolute;
   top: 60px;
   right: 80px;
-  width: 300px;
+  width: 320px;
+  max-height: 400px; /* 👈 límite de altura */
+  overflow-y: auto; /* 👈 scroll vertical */
   background: rgba(20, 20, 40, 0.95);
   border-radius: 12px;
   box-shadow: 0 8px 20px rgba(0,0,0,0.3);
@@ -14,38 +16,84 @@
   border: 1px solid rgba(255,255,255,0.1);
 }
 
+/* Personaliza el scroll */
+.notificaciones-panel::-webkit-scrollbar {
+  width: 8px;
+}
+.notificaciones-panel::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.3);
+  border-radius: 4px;
+}
+.notificaciones-panel::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.5);
+}
+
 .notificaciones-panel h3 {
   margin-bottom: 10px;
   font-size: 1.1rem;
   text-align: center;
 }
 
-.solicitud-item, .notificacion {
+.solicitud-item, .seguidor-item, .notificacion {
   background: rgba(255,255,255,0.05);
   padding: 10px;
   border-radius: 8px;
   margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.btn-aceptar {
-  background: #28a745;
+/* 👇 Foto más pequeña */
+.foto-perfil-pequena {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+p {
+  margin: 0;
+  flex: 1;
+}
+
+.fecha {
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+
+.btn-aceptar, .btn-rechazar {
   border: none;
   color: white;
   padding: 5px 10px;
   border-radius: 4px;
   cursor: pointer;
+  font-size: 0.85rem;
 }
 
-.btn-rechazar {
-  background: #dc3545;
-  border: none;
-  color: white;
-  padding: 5px 10px;
-  border-radius: 4px;
-  cursor: pointer;
-}
+.btn-aceptar { background: #28a745; }
+.btn-rechazar { background: #dc3545; }
 
 .sin-notificaciones {
   text-align: center;
   opacity: 0.8;
+}
+
+/* 🔴 Contador de notificaciones */
+.notificacion-icon {
+  position: relative;
+  cursor: pointer;
+}
+
+.notificacion-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: red;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 0.75rem;
+  font-weight: bold;
 }

@@ -14,8 +14,8 @@ export default function PaginaPrincipal() {
   const [publicaciones, setPublicaciones] = useState<any[]>([]);
   const [contenido, setContenido] = useState("");
   const [file, setFile] = useState<File | null>(null);
-  const [mostrarNotificaciones, setMostrarNotificaciones] = useState(false); // ✅ Nuevo estado
 
+  
   // Añadir clase al body
   useEffect(() => {
     document.body.classList.add("pagina-principal");
@@ -61,14 +61,7 @@ export default function PaginaPrincipal() {
       <div className="topbar">
         <input type="text" placeholder="Buscar" className="search-input" />
 
-        {/* 🔔 Botón de notificaciones con panel */}
-        <button
-          className="icon-btn"
-          onClick={() => setMostrarNotificaciones((prev) => !prev)}
-        >
-          🔔
-        </button>
-        {mostrarNotificaciones && <NotificacionesPanel usuario={usuario} />}
+        <NotificacionesPanel usuario={usuario} />
 
         {/* Perfil del usuario autenticado */}
         <button className="img-btn" onClick={() => navigate("/perfil")}>
