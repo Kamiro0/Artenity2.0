@@ -119,15 +119,40 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
     }
 
 # ------------------ PERFILES ------------------
-@app.get("/perfiles/{id_usuario}", response_model=schemas.PerfilResponse)
-def obtener_perfil(id_usuario: int, db: Session = Depends(get_db)):
+@app.get("/perfiles/{id_usuario}")
+def obtener_perfil(
+    id_usuario: int,
+    db: Session = Depends(get_db),
+    user_id: int = Depends(get_current_user_id)  # 👈 se obtiene el usuario autenticado
+):
     perfil = db.query(models.Perfil).filter(models.Perfil.id_usuario == id_usuario).first()
     if not perfil:
         perfil = models.Perfil(id_usuario=id_usuario)
         db.add(perfil)
         db.commit()
         db.refresh(perfil)
-    return perfil
+
+    # Verificar si el usuario actual sigue a este perfil
+    sigue = db.query(models.SeguirUsuario).filter(
+        models.SeguirUsuario.id_seguidor == user_id,
+        models.SeguirUsuario.id_seguido == id_usuario
+    ).first()
+
+    usuario = db.query(models.Usuario).filter(models.Usuario.id_usuario == id_usuario).first()
+
+    return {
+        "id_perfil": perfil.id_perfil,
+        "id_usuario": perfil.id_usuario,
+        "descripcion": perfil.descripcion,
+        "biografia": perfil.biografia,
+        "foto_perfil": perfil.foto_perfil,
+        "sigo": bool(sigue),  # 👈 nuevo campo
+        "usuario": {
+            "nombre": usuario.nombre,
+            "apellido": usuario.apellido,
+            "nombre_usuario": usuario.nombre_usuario
+        }
+    }
 
 @app.put("/perfiles/{id_usuario}", response_model=schemas.PerfilResponse)
 async def actualizar_perfil(

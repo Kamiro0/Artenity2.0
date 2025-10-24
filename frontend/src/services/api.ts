@@ -60,7 +60,9 @@ export function logoutUsuario() {
 // ======== PERFILES ========
 export async function getPerfil(id_usuario: number) {
   const res = await api.get(`/perfiles/${id_usuario}`, {
-    headers: { token: getToken() },
+    headers: {
+      token: getToken(),
+      id_usuario: getUsuarioId() },
   });
   return res.data;
 }
