@@ -374,24 +374,29 @@ def responder_solicitud_amistad(
     db: Session = Depends(get_db),
     user_id: int = Depends(get_current_user_id)
 ):
-    solicitud = db.query(models.SolicitudAmistad).filter(models.SolicitudAmistad.id_solicitud == id_solicitud).first()
+    
+    solicitud = db.query(models.SolicitudAmistad).filter(
+        models.SolicitudAmistad.id_solicitud == id_solicitud
+    ).first()
     if not solicitud:
         raise HTTPException(status_code=404, detail="Solicitud no encontrada")
 
     if solicitud.id_receptor != user_id:
         raise HTTPException(status_code=403, detail="No puedes responder solicitudes que no son tuyas")
 
+  
     if solicitud.estado != "pendiente":
         raise HTTPException(status_code=400, detail="Esta solicitud ya fue respondida")
 
+    # Validar estado
     if estado not in ["aceptada", "rechazada"]:
         raise HTTPException(status_code=400, detail="Estado inválido")
 
+   
     solicitud.estado = estado
     db.commit()
     db.refresh(solicitud)
 
-    # Crear notificación al emisor
     receptor = db.query(models.Usuario).filter(models.Usuario.id_usuario == user_id).first()
     noti_msg = (
         f"{receptor.nombre_usuario} aceptó tu solicitud de amistad"
@@ -407,29 +412,75 @@ def responder_solicitud_amistad(
     db.add(noti)
     db.commit()
 
+   
+    if estado == "aceptada":
+        existe = db.query(models.Amistad).filter(
+            ((models.Amistad.id_usuario1 == solicitud.id_emisor) & (models.Amistad.id_usuario2 == solicitud.id_receptor)) |
+            ((models.Amistad.id_usuario1 == solicitud.id_receptor) & (models.Amistad.id_usuario2 == solicitud.id_emisor))
+        ).first()
+
+        if not existe:
+            nueva_amistad = models.Amistad(
+                id_usuario1=solicitud.id_emisor,
+                id_usuario2=solicitud.id_receptor,
+                estado="aceptada"
+            )
+            db.add(nueva_amistad)
+            db.commit()
+
+        
+        db.delete(solicitud)
+        db.commit()
+
     return {"mensaje": f"Solicitud {estado} correctamente"}
 
-
+# ------------------ AMIGOS ------------------
 @app.get("/amigos")
 def obtener_amigos(
+    id_usuario: int = None,
     db: Session = Depends(get_db),
     user_id: int = Depends(get_current_user_id)
 ):
-    solicitudes = db.query(models.SolicitudAmistad).filter(
-        ((models.SolicitudAmistad.id_emisor == user_id) | (models.SolicitudAmistad.id_receptor == user_id)) &
-        (models.SolicitudAmistad.estado == "aceptada")
-    ).all()
+    """
+    Retorna la lista de amigos de un usuario.
+    - Si se pasa id_usuario: retorna los amigos de ese usuario.
+    - Si no se pasa: retorna los amigos del usuario autenticado.
+    """
+
+    # Si no se pasa un id_usuario en la query, usar el autenticado
+    id_usuario = id_usuario or user_id
+
+    # Buscar amistades donde el usuario sea parte (como emisor o receptor)
+    amistades = (
+        db.query(models.Amistad)
+        .filter(
+            ((models.Amistad.id_usuario1 == id_usuario) | 
+             (models.Amistad.id_usuario2 == id_usuario)),
+            (models.Amistad.estado == "aceptada")
+        )
+        .all()
+    )
+
+    if not amistades:
+        return []
 
     amigos = []
-    for s in solicitudes:
-        amigo_id = s.id_emisor if s.id_receptor == user_id else s.id_receptor
+    for amistad in amistades:
+        # Determinar el id del amigo (el otro usuario en la relación)
+        amigo_id = (
+            amistad.id_usuario2 if amistad.id_usuario1 == id_usuario 
+            else amistad.id_usuario1
+        )
+
+        # Obtener información del amigo
         amigo = db.query(models.Usuario).filter(models.Usuario.id_usuario == amigo_id).first()
-        perfil = db.query(models.Perfil).filter(models.Perfil.id_usuario == amigo_id).first()
-        amigos.append({
-            "id_usuario": amigo.id_usuario,
-            "nombre_usuario": amigo.nombre_usuario,
-            "foto_perfil": perfil.foto_perfil if perfil else None
-        })
+        if amigo:
+            amigos.append({
+                "id_usuario": amigo.id_usuario,
+                "nombre_usuario": amigo.nombre_usuario,
+                "foto_perfil": amigo.perfil.foto_perfil if amigo.perfil else None
+            })
+
     return amigos
 
 # ------------------ ELIMINAR AMIGO ------------------

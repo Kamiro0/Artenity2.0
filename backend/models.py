@@ -112,3 +112,11 @@ class Notificacion(Base):
     id_referencia = Column(Integer, nullable=True)
 
     usuario = relationship("Usuario", back_populates="notificaciones")
+
+# ------------------ AMISTADES ------------------
+class Amistad(Base):
+    __tablename__ = "amistades"
+    id_amistad = Column(Integer, primary_key=True, index=True)
+    id_usuario1 = Column(Integer, ForeignKey("usuarios.id_usuario"))
+    id_usuario2 = Column(Integer, ForeignKey("usuarios.id_usuario"))
+    estado = Column(String)  # pendiente / aceptada / rechazada

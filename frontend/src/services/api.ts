@@ -144,12 +144,15 @@ export async function obtenerSolicitudesPendientes() {
   return res.data;
 }
 
-export async function obtenerAmigos() {
-  const res = await api.get("/amigos", {
+export async function obtenerAmigos(id_usuario?: number) {
+  const url = id_usuario ? `/amigos?id_usuario=${id_usuario}` : "/amigos";
+  const res = await api.get(url, {
     headers: { token: getToken(), id_usuario: getUsuarioId() },
   });
   return res.data;
 }
+
+
  
 // ======== ELIMINAR AMIGO ========
 export const eliminarAmigo = async (id_amigo: number) => {

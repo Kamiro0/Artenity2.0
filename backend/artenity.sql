@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 05-10-2025 a las 23:51:28
+-- Tiempo de generación: 25-10-2025 a las 22:57:03
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.0.30
 
@@ -20,6 +20,27 @@ SET time_zone = "+00:00";
 --
 -- Base de datos: `artenity`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `amistades`
+--
+
+CREATE TABLE `amistades` (
+  `id_amistad` int(11) NOT NULL,
+  `id_usuario1` int(11) NOT NULL,
+  `id_usuario2` int(11) NOT NULL,
+  `estado` varchar(20) NOT NULL DEFAULT 'pendiente'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `amistades`
+--
+
+INSERT INTO `amistades` (`id_amistad`, `id_usuario1`, `id_usuario2`, `estado`) VALUES
+(1, 57, 58, 'aceptada'),
+(2, 1, 58, 'aceptada');
 
 -- --------------------------------------------------------
 
@@ -569,46 +590,62 @@ INSERT INTO `mensajes_privados` (`id_mensaje`, `id_emisor`, `id_receptor`, `cont
 CREATE TABLE `notificaciones` (
   `id_notificacion` int(11) NOT NULL,
   `id_usuario` int(11) NOT NULL,
-  `mensaje` text DEFAULT NULL,
+  `mensaje` varchar(255) NOT NULL,
   `leido` tinyint(1) DEFAULT 0,
-  `fecha` datetime DEFAULT current_timestamp()
+  `fecha` datetime DEFAULT current_timestamp(),
+  `tipo` varchar(100) DEFAULT NULL,
+  `id_referencia` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `notificaciones`
 --
 
-INSERT INTO `notificaciones` (`id_notificacion`, `id_usuario`, `mensaje`, `leido`, `fecha`) VALUES
-(1, 1, 'Tu perfil fue visitado por otro usuario.', 0, '2025-01-08 09:00:00'),
-(2, 2, 'Tu publicación recibió una nueva reacción.', 1, '2025-01-09 10:15:00'),
-(3, 3, 'Has sido mencionado en un comentario.', 0, '2025-01-10 11:30:00'),
-(4, 4, 'Tu obra fue destacada en la galería.', 1, '2025-01-11 12:45:00'),
-(5, 5, 'Nueva solicitud de seguimiento.', 0, '2025-01-12 14:00:00'),
-(6, 6, 'Tu contraseña ha sido cambiada.', 1, '2025-01-13 15:15:00'),
-(7, 7, 'Alguien ha comentado en tu obra.', 0, '2025-01-14 16:30:00'),
-(8, 8, 'Tu cuenta ha sido verificada.', 1, '2025-01-15 17:45:00'),
-(9, 9, 'Publicación reportada eliminada.', 1, '2025-01-16 19:00:00'),
-(10, 10, 'Nuevo taller disponible.', 0, '2025-01-17 20:15:00'),
-(11, 11, 'Recibiste un mensaje privado.', 0, '2025-01-18 21:30:00'),
-(12, 12, 'Tu perfil fue actualizado.', 1, '2025-01-19 22:45:00'),
-(13, 13, 'Un amigo se unió a Artenity.', 0, '2025-01-20 23:59:00'),
-(14, 14, 'Has sido bloqueado por otro usuario.', 1, '2025-01-21 08:00:00'),
-(15, 15, 'Tu contenido fue valorado positivamente.', 0, '2025-01-22 09:30:00'),
-(16, 16, 'Tienes nuevos seguidores.', 1, '2025-01-23 10:45:00'),
-(17, 17, 'Tu configuración ha sido cambiada.', 1, '2025-01-24 12:00:00'),
-(18, 18, 'Un administrador respondió tu reporte.', 1, '2025-01-25 13:15:00'),
-(19, 19, 'Tu mensaje fue leído.', 1, '2025-01-26 14:30:00'),
-(20, 20, 'Actualización de términos y condiciones.', 0, '2025-01-27 15:45:00'),
-(21, 21, 'Recibiste una invitación a comunidad.', 0, '2025-01-28 17:00:00'),
-(22, 22, 'Un taller al que te inscribiste comienza pronto.', 0, '2025-01-29 18:15:00'),
-(23, 23, 'Tu obra fue agregada a una colección.', 1, '2025-01-30 19:30:00'),
-(24, 24, 'Tienes nuevos mensajes pendientes.', 0, '2025-01-31 21:00:00'),
-(25, 25, 'El usuario que bloqueaste cambió su nombre.', 1, '2025-02-01 22:10:00'),
-(26, 26, 'Tu cuenta fue visitada desde un nuevo dispositivo.', 0, '2025-02-02 08:20:00'),
-(27, 27, 'Has recibido una recomendación.', 1, '2025-02-03 09:35:00'),
-(28, 28, 'Tu reacción ha sido respondida.', 0, '2025-02-04 10:50:00'),
-(29, 29, 'Se ha actualizado tu categoría de arte preferido.', 1, '2025-02-05 12:05:00'),
-(30, 30, 'El administrador publicó una noticia importante.', 0, '2025-02-06 13:20:00');
+INSERT INTO `notificaciones` (`id_notificacion`, `id_usuario`, `mensaje`, `leido`, `fecha`, `tipo`, `id_referencia`) VALUES
+(1, 57, 'El usuario 1 te ha comenzado a seguir', 1, '2025-10-12 01:04:58', 'nuevo_seguidor', NULL),
+(2, 24, 'ozuna el real comenzó a seguirte', 0, '2025-10-12 21:37:39', 'nuevo_seguidor', 3),
+(3, 56, 'witer365 comenzó a seguirte', 1, '2025-10-12 22:02:11', 'nuevo_seguidor', 4),
+(4, 57, 'and comenzó a seguirte', 1, '2025-10-12 22:08:08', 'nuevo_seguidor', 5),
+(5, 57, 'ozuna el real comenzó a seguirte', 1, '2025-10-12 23:20:59', 'nuevo_seguidor', 6),
+(6, 22, 'and comenzó a seguirte', 1, '2025-10-24 12:08:58', 'nuevo_seguidor', 7),
+(7, 56, 'ozuna el real comenzó a seguirte', 1, '2025-10-24 12:13:00', 'nuevo_seguidor', 8),
+(8, 57, 'laurapintora comenzó a seguirte', 1, '2025-10-24 14:19:16', 'nuevo_seguidor', 9),
+(9, 58, 'and comenzó a seguirte', 1, '2025-10-24 17:04:07', 'nuevo_seguidor', 10),
+(10, 58, 'and comenzó a seguirte', 1, '2025-10-24 17:05:04', 'nuevo_seguidor', 11),
+(11, 58, 'witer365 comenzó a seguirte', 1, '2025-10-24 17:10:10', 'nuevo_seguidor', 12),
+(12, 57, 'laurapintora comenzó a seguirte', 1, '2025-10-24 17:11:31', 'nuevo_seguidor', 13),
+(13, 58, 'and comenzó a seguirte', 1, '2025-10-24 17:44:46', 'nuevo_seguidor', 14),
+(14, 56, 'witer365 comenzó a seguirte', 1, '2025-10-24 17:54:01', 'nuevo_seguidor', 15),
+(15, 57, 'laurapintora comenzó a seguirte', 1, '2025-10-24 18:11:08', 'nuevo_seguidor', 16),
+(16, 58, 'witer365 te ha enviado una solicitud de amistad', 1, '2025-10-24 18:19:51', 'solicitud_amistad', 4),
+(17, 57, 'laurapintora aceptó tu solicitud de amistad', 1, '2025-10-24 18:28:02', 'amistad_aceptada', 4),
+(18, 58, 'and te ha enviado una solicitud de amistad', 1, '2025-10-24 18:29:47', 'solicitud_amistad', 5),
+(19, 56, 'laurapintora aceptó tu solicitud de amistad', 1, '2025-10-24 18:30:19', 'amistad_aceptada', 5),
+(20, 22, 'laurapintora comenzó a seguirte', 1, '2025-10-24 18:37:04', 'nuevo_seguidor', 17),
+(21, 58, ' te ha enviado una solicitud de amistad', 1, '2025-10-24 18:38:22', 'solicitud_amistad', 6),
+(22, 56, 'laurapintora te ha enviado una solicitud de amistad', 1, '2025-10-24 18:48:26', 'solicitud_amistad', 7),
+(23, 22, 'laurapintora aceptó tu solicitud de amistad', 1, '2025-10-24 18:54:56', 'amistad_aceptada', 6),
+(24, 22, 'witer365 te ha enviado una solicitud de amistad', 1, '2025-10-24 18:56:01', 'solicitud_amistad', 8),
+(25, 57, ' aceptó tu solicitud de amistad', 1, '2025-10-24 18:56:50', 'amistad_aceptada', 8),
+(26, 56, ' te ha enviado una solicitud de amistad', 1, '2025-10-24 18:57:31', 'solicitud_amistad', 9),
+(27, 58, 'and aceptó tu solicitud de amistad', 1, '2025-10-24 18:57:54', 'amistad_aceptada', 7),
+(28, 22, 'and rechazó tu solicitud de amistad', 1, '2025-10-24 18:57:55', 'amistad_rechazada', 9),
+(29, 56, ' te ha enviado una solicitud de amistad', 1, '2025-10-24 18:58:33', 'solicitud_amistad', 10),
+(30, 22, 'and aceptó tu solicitud de amistad', 0, '2025-10-24 18:59:01', 'amistad_aceptada', 10),
+(31, 57, 'laurapintora te ha enviado una solicitud de amistad', 1, '2025-10-24 19:07:46', 'solicitud_amistad', 11),
+(32, 58, 'witer365 aceptó tu solicitud de amistad', 1, '2025-10-24 19:26:42', 'amistad_aceptada', 11),
+(33, 58, 'witer365 te ha enviado una solicitud de amistad', 1, '2025-10-24 19:27:24', 'solicitud_amistad', 12),
+(34, 57, 'laurapintora aceptó tu solicitud de amistad', 1, '2025-10-24 19:27:56', 'amistad_aceptada', 12),
+(35, 58, 'witer365 te ha enviado una solicitud de amistad', 1, '2025-10-24 19:28:42', 'solicitud_amistad', 13),
+(36, 57, 'laurapintora aceptó tu solicitud de amistad', 1, '2025-10-24 19:36:56', 'amistad_aceptada', 13),
+(37, 58, 'witer365 te ha enviado una solicitud de amistad', 1, '2025-10-24 19:42:13', 'solicitud_amistad', 14),
+(38, 57, 'laurapintora aceptó tu solicitud de amistad', 1, '2025-10-24 19:48:41', 'amistad_aceptada', 14),
+(39, 58, 'witer365 te ha enviado una solicitud de amistad', 1, '2025-10-25 19:52:53', 'solicitud_amistad', 15),
+(40, 57, 'laurapintora aceptó tu solicitud de amistad', 1, '2025-10-25 19:53:17', 'amistad_aceptada', 15),
+(41, 58, 'witer365 te ha enviado una solicitud de amistad', 1, '2025-10-25 20:54:27', 'solicitud_amistad', 16),
+(42, 57, 'laurapintora aceptó tu solicitud de amistad', 1, '2025-10-25 20:54:56', 'amistad_aceptada', 16),
+(43, 58, 'ozuna el real te ha enviado una solicitud de amistad', 1, '2025-10-25 20:55:53', 'solicitud_amistad', 17),
+(44, 1, 'laurapintora aceptó tu solicitud de amistad', 0, '2025-10-25 20:56:10', 'amistad_aceptada', 17);
 
 -- --------------------------------------------------------
 
@@ -618,10 +655,10 @@ INSERT INTO `notificaciones` (`id_notificacion`, `id_usuario`, `mensaje`, `leido
 
 CREATE TABLE `perfiles` (
   `id_perfil` int(11) NOT NULL,
-  `id_usuario` int(11) NOT NULL,
-  `descripcion` text DEFAULT NULL,
+  `id_usuario` int(11) DEFAULT NULL,
+  `descripcion` varchar(255) DEFAULT NULL,
   `foto_perfil` varchar(255) DEFAULT NULL,
-  `biografia` text DEFAULT NULL
+  `biografia` varchar(500) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -629,46 +666,56 @@ CREATE TABLE `perfiles` (
 --
 
 INSERT INTO `perfiles` (`id_perfil`, `id_usuario`, `descripcion`, `foto_perfil`, `biografia`) VALUES
-(1, 1, 'Artista digital apasionado.', 'foto1.jpg', 'Explorador del color y la forma.'),
-(2, 2, 'Dibujante y escritor.', 'foto2.jpg', 'Apasionado por la narrativa gráfica.'),
-(3, 3, 'Pintor abstracto.', 'foto3.jpg', 'Uso la pintura para expresar emociones.'),
-(4, 4, 'Escultora contemporánea.', 'foto4.jpg', 'Transformo ideas en volúmenes.'),
-(5, 5, 'Ilustrador infantil.', 'foto5.jpg', 'Doy vida a personajes mágicos.'),
-(6, 6, 'Diseñador gráfico.', 'foto6.jpg', 'Fusiono arte y comunicación.'),
-(7, 7, 'Creador multimedia.', 'foto7.jpg', 'Arte en movimiento y sonido.'),
-(8, 8, 'Artista urbano.', 'foto8.jpg', 'Las calles son mi lienzo.'),
-(9, 9, 'Poeta visual.', 'foto9.jpg', 'Versos y visuales.'),
-(10, 10, 'Fotógrafa documental.', 'foto10.jpg', 'Historias reales a través del lente.'),
-(11, 11, 'Pintora realista.', 'foto11.jpg', 'Capturo detalles con precisión.'),
-(12, 12, 'Muralista.', 'foto12.jpg', 'Colores en gran formato.'),
-(13, 13, 'Diseñador de modas.', 'foto13.jpg', 'La tela como expresión artística.'),
-(14, 14, 'Dibujante manga.', 'foto14.jpg', 'Historias japonesas con mi estilo.'),
-(15, 15, 'Artista conceptual.', 'foto15.jpg', 'Ideas transformadas en obras.'),
-(16, 16, 'Animadora 2D.', 'foto16.jpg', 'Dibujo que cobra vida.'),
-(17, 17, 'Calígrafa.', 'foto17.jpg', 'El arte de las letras.'),
-(18, 18, 'Escultor de metal.', 'foto18.jpg', 'Fusiono hierro y creatividad.'),
-(19, 19, 'Ilustradora de cuentos.', 'foto19.jpg', 'Imágenes para soñar.'),
-(20, 20, 'Artista experimental.', 'foto20.jpg', 'Exploro sin límites.'),
-(21, 21, 'Tatuador artístico.', 'foto21.jpg', 'Piel como lienzo.'),
-(22, 22, 'Diseñadora UX/UI.', 'foto22.jpg', 'Experiencias visuales funcionales.'),
-(23, 23, 'Artista digital.', 'foto23.jpg', 'Tecnología y arte como uno solo.'),
-(24, 24, 'Ilustrador político.', 'foto24.jpg', 'Dibujo para reflexionar.'),
-(25, 25, 'Diseñadora de joyas.', 'foto25.jpg', 'Arte en pequeño formato.'),
-(26, 26, 'Escultora de cerámica.', 'foto26.jpg', 'Barro y manos, combinación perfecta.'),
-(27, 27, 'Acuarelista.', 'foto27.jpg', 'Colores que fluyen.'),
-(28, 28, 'Retratista.', 'foto28.jpg', 'Capturo la esencia humana.'),
-(29, 29, 'Videoartista.', 'foto29.jpg', 'Narrativas en movimiento.'),
-(30, 30, 'Creadora de instalaciones.', 'foto30.jpg', 'Espacios transformados en arte.'),
-(31, 1, 'Artista visual apasionada por los paisajes', 'foto1.jpg', 'Me inspiro en la naturaleza'),
-(32, 2, 'Escultor con experiencia en mármol y bronce', 'foto2.jpg', 'Exploro las formas y el volumen'),
-(33, 3, 'Fotógrafa urbana', 'foto3.jpg', 'Capturo instantes únicos en la ciudad'),
-(34, 4, 'Músico y guitarrista clásico', 'foto4.jpg', 'La música es el lenguaje universal'),
-(35, 5, 'Bailarina de danza contemporánea', 'foto5.jpg', 'Expreso emociones a través del movimiento'),
-(36, 6, 'Poeta romántico', 'foto6.jpg', 'Escribo versos sobre el amor y la vida'),
-(37, 7, 'Actriz de teatro independiente', 'foto7.jpg', 'El escenario es mi hogar'),
-(38, 8, 'Cineasta en formación', 'foto8.jpg', 'Creo historias con imágenes'),
-(39, 9, 'Diseñador gráfico', 'foto9.jpg', 'Diseño con propósito e innovación'),
-(40, 10, 'Ilustradora digital', 'foto10.jpg', 'Exploro mundos de fantasía en mis ilustraciones');
+(1, 1, NULL, 'http://localhost:8000/static/perfiles/perfil_1.jpg', NULL),
+(2, 2, NULL, NULL, NULL),
+(3, 3, NULL, NULL, NULL),
+(4, 4, NULL, NULL, NULL),
+(5, 5, NULL, NULL, NULL),
+(6, 6, NULL, NULL, NULL),
+(7, 7, NULL, NULL, NULL),
+(8, 8, NULL, NULL, NULL),
+(9, 9, NULL, NULL, NULL),
+(10, 10, NULL, NULL, NULL),
+(11, 11, NULL, NULL, NULL),
+(12, 12, NULL, NULL, NULL),
+(13, 13, NULL, NULL, NULL),
+(14, 14, NULL, NULL, NULL),
+(15, 15, NULL, NULL, NULL),
+(16, 16, NULL, NULL, NULL),
+(17, 17, NULL, NULL, NULL),
+(18, 18, NULL, NULL, NULL),
+(19, 19, NULL, NULL, NULL),
+(20, 20, NULL, NULL, NULL),
+(21, 21, NULL, NULL, NULL),
+(22, 22, 'si', 'http://localhost:8000/static/perfiles/perfil_22.jpg', 'si'),
+(23, 23, NULL, NULL, NULL),
+(24, 24, NULL, 'http://localhost:8000/static/perfiles/perfil_24.png', NULL),
+(25, 25, NULL, NULL, NULL),
+(26, 26, NULL, NULL, NULL),
+(27, 27, NULL, NULL, NULL),
+(28, 28, NULL, NULL, NULL),
+(29, 29, NULL, NULL, NULL),
+(30, 30, NULL, NULL, NULL),
+(31, 31, NULL, NULL, NULL),
+(32, 32, NULL, NULL, NULL),
+(33, 33, NULL, NULL, NULL),
+(35, 35, NULL, NULL, NULL),
+(36, 36, NULL, NULL, NULL),
+(37, 37, NULL, NULL, NULL),
+(38, 38, NULL, NULL, NULL),
+(39, 39, NULL, NULL, NULL),
+(40, 40, NULL, NULL, NULL),
+(41, 41, NULL, NULL, NULL),
+(42, 46, NULL, NULL, NULL),
+(43, 49, NULL, NULL, NULL),
+(44, 51, NULL, NULL, NULL),
+(45, 52, NULL, NULL, NULL),
+(46, 53, NULL, NULL, NULL),
+(47, 54, NULL, NULL, NULL),
+(48, 55, NULL, NULL, NULL),
+(49, 56, 'tan poco se', 'http://localhost:8000/static/perfiles/perfil_56.avif', 'me gusta el arte y dormir'),
+(50, 57, 'me gusta dormir', 'http://localhost:8000/static/perfiles/perfil_57.jpg', 'tengo hambre'),
+(51, 58, '\"Artista digital especializado en surrealismo moderno.\"', 'http://localhost:8000/static/perfiles/perfil_58.jpg', '\"Desde 2015 exploro el arte digital fusionando elementos de fantasía y tecnología.\"');
 
 -- --------------------------------------------------------
 
@@ -752,120 +799,19 @@ INSERT INTO `publicaciones` (`id_publicacion`, `id_usuario`, `contenido`, `image
 (3, 1, 'hola', NULL, '2025-10-05 20:11:58'),
 (4, 1, '', 'http://localhost:8000/static/posts\\1_1.png', '2025-10-05 20:12:19'),
 (5, 51, 'hola si', 'http://localhost:8000/static/posts\\51_ARTIVERSE.drawio.png', '2025-10-05 20:16:42'),
-(6, 49, 'HOLA COMO ESTAN EPERO QUE BIEN ', 'http://localhost:8000/static/posts\\49_8d3bec423a4c16808c32fdb6f28a44e8.jpg', '2025-10-05 20:59:16');
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `publicaciones_obra`
---
-
-CREATE TABLE `publicaciones_obra` (
-  `id_publicacion` int(11) NOT NULL,
-  `id_usuario` int(11) NOT NULL,
-  `id_categoria` int(11) NOT NULL,
-  `titulo` varchar(200) NOT NULL,
-  `descripcion` text DEFAULT NULL,
-  `contenido` text DEFAULT NULL,
-  `fecha_publicacion` datetime DEFAULT current_timestamp(),
-  `estado` varchar(20) DEFAULT 'publicado'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `publicaciones_obra`
---
-
-INSERT INTO `publicaciones_obra` (`id_publicacion`, `id_usuario`, `id_categoria`, `titulo`, `descripcion`, `contenido`, `fecha_publicacion`, `estado`) VALUES
-(1, 1, 1, 'Cima nevada', 'Montañas iluminadas por el amanecer', 'contenido2.jpg', '2025-01-11 08:00:00', 'publicado'),
-(2, 1, 1, 'Bruma matinal', 'Paisaje con neblina sutil', 'contenido3.jpg', '2025-01-12 08:00:00', 'publicado'),
-(3, 2, 2, 'Eco de metal', 'Escultura circular en bronce', 'escultura2.png', '2025-01-12 08:05:00', 'publicado'),
-(4, 2, 2, 'Forma ascendente', 'Torre abstracta pulida', 'escultura3.png', '2025-01-12 08:10:00', 'publicado'),
-(5, 2, 2, 'Equilibrio imposible', 'Piezas suspendidas en armonía', 'escultura4.png', '2025-01-13 08:10:00', 'publicado'),
-(6, 3, 3, 'Sombras cruzadas', 'Contraste intenso de luces', 'foto2.jpg', '2025-01-11 08:15:00', 'publicado'),
-(7, 3, 3, 'Mirada oculta', 'Retrato en sombra parcial', 'foto3.jpg', '2025-01-12 08:15:00', 'publicado'),
-(8, 3, 3, 'Reflejo del alma', 'Captura espontánea emocional', 'foto4.jpg', '2025-01-13 08:15:00', 'publicado'),
-(9, 3, 3, 'Camino vacío', 'Fotografía urbana solitaria', 'foto5.jpg', '2025-01-14 08:15:00', 'publicado'),
-(10, 4, 4, 'Pixelarte', 'Diseño con píxeles expresivos', 'digital2.png', '2025-01-11 08:20:00', 'publicado'),
-(11, 4, 4, 'Sinapsis digital', 'Conexiones neuronales estilizadas', 'digital3.png', '2025-01-12 08:20:00', 'publicado'),
-(12, 4, 4, 'Espejo binario', 'Doble figura virtual', 'digital4.png', '2025-01-13 08:20:00', 'publicado'),
-(13, 4, 4, 'Paisaje sintético', 'Naturaleza renderizada', 'digital5.png', '2025-01-14 08:20:00', 'publicado'),
-(14, 4, 4, 'Energía vectorial', 'Composición basada en líneas de fuerza', 'digital6.png', '2025-01-15 08:20:00', 'publicado'),
-(15, 5, 5, 'Poster vibrante', 'Colores saturados con mensaje directo', 'diseño2.pdf', '2025-01-11 08:30:00', 'publicado'),
-(16, 5, 5, 'Diseño poético', 'Frase tipográfica minimalista', 'diseño3.pdf', '2025-01-12 08:30:00', 'publicado'),
-(17, 5, 5, 'Cartel político', 'Diseño con impacto social', 'diseño4.pdf', '2025-01-13 08:30:00', 'publicado'),
-(18, 5, 5, 'Póster retro', 'Inspiración en los años 80', 'diseño5.pdf', '2025-01-14 08:30:00', 'publicado'),
-(19, 5, 5, 'Cultura visual', 'Diseño que representa tradiciones', 'diseño6.pdf', '2025-01-15 08:30:00', 'publicado'),
-(20, 5, 5, 'Gráfica rebelde', 'Tipografía y color para protestar', 'diseño7.pdf', '2025-01-16 08:30:00', 'publicado'),
-(21, 6, 6, 'Personaje fantástico', 'Ilustración de criatura mágica', 'ilustracion1.jpg', '2025-01-10 08:40:00', 'publicado'),
-(22, 7, 7, 'Río en acuarela', 'Representación de un paisaje acuático', 'acuarela1.jpg', '2025-01-10 08:50:00', 'publicado'),
-(23, 8, 8, 'Flor en tinta', 'Dibujo monocromo de flor', 'tinta1.jpg', '2025-01-10 09:00:00', 'publicado'),
-(24, 9, 9, 'Recortes de ideas', 'Collage con papel reciclado', 'collage1.jpg', '2025-01-10 09:10:00', 'publicado'),
-(25, 10, 10, 'Mural urbano', 'Pintura mural en barrio histórico', 'mural1.jpg', '2025-01-10 09:20:00', 'publicado'),
-(26, 11, 11, 'Graffiti neón', 'Arte callejero con aerosol', 'graffiti1.jpg', '2025-01-10 09:30:00', 'publicado'),
-(27, 12, 12, 'Rostro fragmentado', 'Obra abstracta con figuras', 'abstracto1.png', '2025-01-10 09:40:00', 'publicado'),
-(28, 13, 13, 'Mesa con frutas', 'Naturaleza muerta realista', 'realista1.jpg', '2025-01-10 09:50:00', 'publicado'),
-(29, 14, 14, 'La idea pesa más', 'Conceptualización sobre el arte moderno', 'conceptual1.docx', '2025-01-10 10:00:00', 'publicado'),
-(30, 15, 15, 'Retrato de madre', 'Dibujo a lápiz', 'retrato1.jpg', '2025-01-10 10:10:00', 'publicado'),
-(31, 16, 16, 'Valle al atardecer', 'Acuarela sobre lienzo', 'acuarela2.jpg', '2025-01-10 10:20:00', 'publicado'),
-(32, 17, 17, 'Más allá del cuerpo', 'Performance documentada', 'performance1.mp4', '2025-01-10 10:30:00', 'publicado'),
-(33, 18, 18, 'Furia urbana', 'Graffiti expresionista', 'graffiti2.jpg', '2025-01-10 10:40:00', 'publicado'),
-(34, 19, 19, 'Crítica invisible', 'Arte político en formato mural', 'politico1.jpg', '2025-01-10 10:50:00', 'publicado'),
-(35, 20, 20, 'Instalación sonora', 'Grabaciones ambientales y montaje', 'sonido1.mp3', '2025-01-10 11:00:00', 'publicado'),
-(36, 21, 21, 'Tipografía con alma', 'Ejercicio caligráfico artístico', 'caligrafia1.jpg', '2025-01-10 11:10:00', 'publicado'),
-(37, 22, 22, 'Sueño de hilos', 'Tejido de autor', 'textil1.jpg', '2025-01-10 11:20:00', 'publicado'),
-(38, 23, 23, 'Paisaje UX/UI', 'Prototipo visual para app artística', 'ux1.figma', '2025-01-10 11:30:00', 'publicado'),
-(39, 24, 24, 'Máscara ancestral', 'Arte inspirado en culturas indígenas', 'indigena1.jpg', '2025-01-10 11:40:00', 'publicado'),
-(40, 25, 25, 'Laberinto de formas', 'Acrílico sobre lienzo', 'abstracto2.jpg', '2025-01-10 11:50:00', 'publicado'),
-(41, 26, 26, 'Mensaje escondido', 'Graffiti político', 'grafico3.jpg', '2025-01-10 12:00:00', 'publicado'),
-(42, 27, 31, 'Moda conceptual', 'Diseño de vestuario experimental', 'moda1.png', '2025-01-10 12:10:00', 'publicado'),
-(43, 27, 32, 'Texturas del futuro', 'Exploración textil con materiales no convencionales', 'moda2.png', '2025-01-11 12:10:00', 'publicado'),
-(44, 27, 33, 'Vestir la emoción', 'Diseño que expresa estados de ánimo', 'moda3.png', '2025-01-12 12:10:00', 'publicado'),
-(45, 27, 34, 'Ruptura de forma', 'Vestuario que desafía la silueta tradicional', 'moda4.png', '2025-01-13 12:10:00', 'publicado'),
-(46, 27, 35, 'Diseño efímero', 'Moda creada con materiales biodegradables', 'moda5.png', '2025-01-14 12:10:00', 'publicado'),
-(47, 27, 33, 'Identidad portátil', 'Prenda que refleja la cultura del usuario', 'moda6.png', '2025-01-15 12:10:00', 'publicado'),
-(48, 27, 32, 'Volumen poético', 'Juego escultórico con telas voluminosas', 'moda7.png', '2025-01-16 12:10:00', 'publicado'),
-(49, 27, 34, 'Silencio visual', 'Diseño monocromo con carga conceptual', 'moda8.png', '2025-01-17 12:10:00', 'publicado'),
-(50, 28, 28, 'Taza con textura', 'Cerámica artística vidriada', 'ceramica1.jpg', '2025-01-10 12:20:00', 'publicado'),
-(51, 29, 19, 'Espacio blanco', 'Instalación minimalista', 'instalacion1.jpg', '2025-01-10 12:30:00', 'publicado'),
-(52, 29, 20, 'Estructura etérea', 'Construcción con materiales translúcidos', 'instalacion2.jpg', '2025-01-11 09:00:00', 'publicado'),
-(53, 29, 21, 'Sombras que hablan', 'Juego de luces y formas en el espacio', 'instalacion3.jpg', '2025-01-12 11:15:00', 'publicado'),
-(54, 29, 22, 'Fragmentos del silencio', 'Objetos suspendidos en equilibrio', 'instalacion4.jpg', '2025-01-13 16:30:00', 'publicado'),
-(55, 29, 23, 'Vacío habitado', 'Minimalismo que estimula la reflexión', 'instalacion5.jpg', '2025-01-14 14:10:00', 'publicado'),
-(56, 29, 24, 'Luz filtrada', 'Instalación con telas translúcidas', 'instalacion6.jpg', '2025-01-15 10:25:00', 'publicado'),
-(57, 29, 25, 'Materia poética', 'Instalación inspirada en versos visuales', 'instalacion7.jpg', '2025-01-16 11:45:00', 'publicado'),
-(58, 29, 26, 'Narrativa espacial', 'Relato tridimensional con objetos', 'instalacion8.jpg', '2025-01-17 13:20:00', 'publicado'),
-(59, 29, 27, 'Drama suspendido', 'Tensión emocional en materiales visuales', 'instalacion9.jpg', '2025-01-18 15:10:00', 'publicado'),
-(60, 29, 28, 'Reflexión crítica', 'Instalación en forma de ensayo visual', 'instalacion10.jpg', '2025-01-19 09:35:00', 'publicado'),
-(61, 29, 29, 'Interfaz sensorial', 'Experiencia interactiva con el entorno', 'instalacion11.jpg', '2025-01-20 14:00:00', 'publicado'),
-(62, 29, 30, 'Presencia digital', 'Obra construida en entornos virtuales', 'instalacion12.jpg', '2025-01-21 10:50:00', 'publicado'),
-(63, 30, 1, 'Ritmo visual', 'Diseño gráfico en movimiento', 'movimiento1.gif', '2025-01-10 12:40:00', 'publicado'),
-(64, 30, 2, 'Color en acción', 'Exploración cromática animada', 'movimiento2.gif', '2025-01-12 09:15:00', 'publicado'),
-(65, 30, 3, 'Tipografía viva', 'Letras que se mueven con estilo', 'movimiento3.gif', '2025-01-15 17:20:00', 'publicado'),
-(66, 30, 4, 'Formas dinámicas', 'Transformación visual continua', 'movimiento4.gif', '2025-01-18 14:45:00', 'publicado'),
-(67, 30, 5, 'Pulso visual', 'El ritmo en el diseño gráfico animado', 'movimiento5.gif', '2025-01-20 11:30:00', 'publicado'),
-(68, 30, 6, 'Movimiento tipográfico', 'Composición cinética de palabras', 'movimiento6.gif', '2025-01-22 16:10:00', 'publicado'),
-(69, 30, 7, 'Diseño fluido', 'Animaciones suaves y envolventes', 'movimiento7.gif', '2025-01-25 10:00:00', 'publicado'),
-(70, 30, 8, 'Secuencia visual', 'Narrativa gráfica animada', 'movimiento8.gif', '2025-01-27 08:55:00', 'publicado'),
-(71, 30, 9, 'Ritmo geométrico', 'Figuras en armonía cinética', 'movimiento9.gif', '2025-01-29 13:50:00', 'publicado'),
-(72, 30, 10, 'Estilo en transición', 'Diseño que cambia con elegancia', 'movimiento10.gif', '2025-01-31 18:05:00', 'publicado'),
-(73, 30, 11, 'Teatralidad gráfica', 'Composición escénica en movimiento', 'movimiento12.gif', '2025-02-01 12:00:00', 'publicado'),
-(74, 30, 12, 'Danza visual', 'Movimiento corporal estilizado', 'movimiento13.gif', '2025-02-02 08:30:00', 'publicado'),
-(75, 30, 13, 'Ópera visual', 'Narrativa lírica en animación', 'movimiento14.gif', '2025-02-03 13:15:00', 'publicado'),
-(76, 30, 14, 'Ballet gráfico', 'Animación con elegancia clásica', 'movimiento15.gif', '2025-02-04 16:45:00', 'publicado'),
-(77, 30, 15, 'Circo animado', 'Color y destreza en forma visual', 'movimiento16.gif', '2025-02-05 10:10:00', 'publicado'),
-(78, 30, 16, 'Mímica digital', 'Gestos animados sin palabras', 'movimiento17.gif', '2025-02-06 11:20:00', 'publicado'),
-(79, 30, 17, 'Melodía visual', 'Sincronización con música clásica', 'movimiento18.gif', '2025-02-07 09:55:00', 'publicado'),
-(80, 30, 18, 'Ilusión de movimiento', 'Efectos ópticos animados', 'movimiento11.gif', '2025-02-02 15:25:00', 'publicado'),
-(81, 1, 1, 'Atardecer en óleo', 'Pintura al óleo inspirada en un atardecer', 'Contenido de la obra 1', '2025-08-24 13:07:21', 'publicado'),
-(82, 2, 2, 'Escultura de mármol', 'Escultura en mármol blanco', 'Contenido de la obra 2', '2025-08-24 13:07:21', 'publicado'),
-(83, 3, 3, 'Retrato fotográfico', 'Fotografía en blanco y negro', 'Contenido de la obra 3', '2025-08-24 13:07:21', 'publicado'),
-(84, 4, 4, 'Canción de guitarra', 'Composición musical instrumental', 'Contenido de la obra 4', '2025-08-24 13:07:21', 'publicado'),
-(85, 5, 5, 'Coreografía urbana', 'Danza contemporánea', 'Contenido de la obra 5', '2025-08-24 13:07:21', 'publicado'),
-(86, 6, 8, 'Poema romántico', 'Versos sobre el amor y la nostalgia', 'Contenido de la obra 6', '2025-08-24 13:07:21', 'publicado'),
-(87, 7, 6, 'Obra teatral breve', 'Guion y actuación de corta duración', 'Contenido de la obra 7', '2025-08-24 13:07:21', 'publicado'),
-(88, 8, 7, 'Corto cinematográfico', 'Producción audiovisual independiente', 'Contenido de la obra 8', '2025-08-24 13:07:21', 'publicado'),
-(89, 9, 9, 'Diseño 3D arquitectónico', 'Modelo en 3D de una casa moderna', 'Contenido de la obra 9', '2025-08-24 13:07:21', 'publicado'),
-(90, 10, 10, 'Ilustración digital fantástica', 'Arte digital con temática fantástica', 'Contenido de la obra 10', '2025-08-24 13:07:21', 'publicado');
+(6, 49, 'HOLA COMO ESTAN EPERO QUE BIEN ', 'http://localhost:8000/static/posts\\49_8d3bec423a4c16808c32fdb6f28a44e8.jpg', '2025-10-05 20:59:16'),
+(7, 56, 'bgbgbgb', 'http://localhost:8000/static/posts\\56_Gráfico de Línea de Tiempo Profesional Moderno Multicolor.png', '2025-10-06 21:48:48'),
+(8, 57, 'bbgbgb', 'http://localhost:8000/static/posts\\57_1.jpg', '2025-10-06 21:55:19'),
+(9, 57, 'njnjnj', 'http://localhost:8000/static/posts\\57_1.jpg', '2025-10-06 23:44:26'),
+(10, 57, 'bbhbh', 'http://localhost:8000/static/posts\\57_1.jpg', '2025-10-07 02:45:59'),
+(11, 57, ' cccc', 'http://localhost:8000/static/posts\\57_1.jpg', '2025-10-09 16:06:45'),
+(12, 24, 'hola ', 'http://localhost:8000/static/posts/24_Captura de pantalla 2025-10-10 183230.png', '2025-10-11 19:55:53'),
+(13, 22, 'ya casi', 'http://localhost:8000/static/posts/22_Gráfico de Línea de Tiempo Profesional Moderno Multicolor.png', '2025-10-11 20:05:30'),
+(14, 57, 'ya casi se logra', 'http://localhost:8000/static/posts/57_3.jpg', '2025-10-11 20:06:46'),
+(15, 57, 'bvbvbvb', 'http://localhost:8000/static/posts/57_2.jpg', '2025-10-11 20:27:39'),
+(16, 56, 'vhgghg', 'http://localhost:8000/static/posts/56_3.jpg', '2025-10-11 23:10:03'),
+(17, 56, 'tengo sueño', 'http://localhost:8000/static/posts/56_5.jpg', '2025-10-12 23:41:42'),
+(18, 58, 'Primera publicación de prueba desde Artenity', 'http://localhost:8000/static/posts/58_4.avif', '2025-10-24 13:59:55');
 
 -- --------------------------------------------------------
 
@@ -919,279 +865,58 @@ INSERT INTO `registro_actividad` (`id_actividad`, `id_usuario`, `accion`, `fecha
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `reportes_contenido`
+-- Estructura de tabla para la tabla `reportar_usuario`
 --
 
-CREATE TABLE `reportes_contenido` (
+CREATE TABLE `reportar_usuario` (
   `id_reporte` int(11) NOT NULL,
-  `id_usuario_reportado` int(11) NOT NULL,
-  `id_usuario_reportante` int(11) NOT NULL,
-  `tipo_contenido` varchar(50) DEFAULT NULL,
-  `id_contenido` int(11) DEFAULT NULL,
-  `motivo` text DEFAULT NULL,
-  `evidencia` text DEFAULT NULL,
-  `estado` enum('pendiente','resuelto') DEFAULT 'pendiente',
-  `fecha_reporte` datetime DEFAULT current_timestamp()
+  `id_reportante` int(11) DEFAULT NULL,
+  `id_reportado` int(11) DEFAULT NULL,
+  `motivo` text NOT NULL,
+  `fecha_reporte` datetime DEFAULT NULL,
+  `estado` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `reportes_contenido`
---
-
-INSERT INTO `reportes_contenido` (`id_reporte`, `id_usuario_reportado`, `id_usuario_reportante`, `tipo_contenido`, `id_contenido`, `motivo`, `evidencia`, `estado`, `fecha_reporte`) VALUES
-(1, 2, 1, 'comentario', 1, 'Lenguaje ofensivo', 'captura1.png', 'pendiente', '2025-01-16 08:00:00'),
-(2, 3, 2, 'publicacion', 5, 'Contenido inapropiado', 'captura2.png', 'pendiente', '2025-01-16 08:05:00'),
-(3, 4, 3, 'comentario', 2, 'Spam', 'captura3.png', 'pendiente', '2025-01-16 08:10:00'),
-(4, 5, 4, 'publicacion', 6, 'Incita al odio', 'captura4.png', 'pendiente', '2025-01-16 08:15:00'),
-(5, 6, 5, 'comentario', 3, 'Contenido ofensivo', 'captura5.png', 'pendiente', '2025-01-16 08:20:00'),
-(6, 7, 6, 'publicacion', 7, 'Desinformación', 'captura6.png', 'pendiente', '2025-01-16 08:25:00'),
-(7, 8, 7, 'comentario', 4, 'Violencia explícita', 'captura7.png', 'pendiente', '2025-01-16 08:30:00'),
-(8, 9, 8, 'publicacion', 8, 'Robo de contenido', 'captura8.png', 'pendiente', '2025-01-16 08:35:00'),
-(9, 10, 9, 'comentario', 5, 'Incita al acoso', 'captura9.png', 'pendiente', '2025-01-16 08:40:00'),
-(10, 11, 10, 'publicacion', 9, 'Contenido racista', 'captura10.png', 'pendiente', '2025-01-16 08:45:00'),
-(11, 12, 11, 'comentario', 6, 'Lenguaje vulgar', 'captura11.png', 'pendiente', '2025-01-16 08:50:00'),
-(12, 13, 12, 'publicacion', 10, 'Sin créditos al autor', 'captura12.png', 'pendiente', '2025-01-16 08:55:00'),
-(13, 14, 13, 'comentario', 7, 'Contenido engañoso', 'captura13.png', 'pendiente', '2025-01-16 09:00:00'),
-(14, 15, 14, 'publicacion', 11, 'Publicación repetida', 'captura14.png', 'pendiente', '2025-01-16 09:05:00'),
-(15, 16, 15, 'comentario', 8, 'Bullying', 'captura15.png', 'pendiente', '2025-01-16 09:10:00'),
-(16, 17, 16, 'publicacion', 12, 'Violación de derechos', 'captura16.png', 'pendiente', '2025-01-16 09:15:00'),
-(17, 18, 17, 'comentario', 9, 'Discriminación', 'captura17.png', 'pendiente', '2025-01-16 09:20:00'),
-(18, 19, 18, 'publicacion', 13, 'Incitación a violencia', 'captura18.png', 'pendiente', '2025-01-16 09:25:00'),
-(19, 20, 19, 'comentario', 10, 'Falsa identidad', 'captura19.png', 'pendiente', '2025-01-16 09:30:00'),
-(20, 21, 20, 'publicacion', 14, 'Contenido explícito', 'captura20.png', 'pendiente', '2025-01-16 09:35:00'),
-(21, 22, 21, 'comentario', 11, 'Troll', 'captura21.png', 'pendiente', '2025-01-16 09:40:00'),
-(22, 23, 22, 'publicacion', 15, 'Robo de idea', 'captura22.png', 'pendiente', '2025-01-16 09:45:00'),
-(23, 24, 23, 'comentario', 12, 'Contenido perturbador', 'captura23.png', 'pendiente', '2025-01-16 09:50:00'),
-(24, 25, 24, 'publicacion', 16, 'Publicidad sin permiso', 'captura24.png', 'pendiente', '2025-01-16 09:55:00'),
-(25, 26, 25, 'comentario', 13, 'Lenguaje ofensivo', 'captura25.png', 'pendiente', '2025-01-16 10:00:00'),
-(26, 27, 26, 'publicacion', 17, 'Violencia gráfica', 'captura26.png', 'pendiente', '2025-01-16 10:05:00'),
-(27, 28, 27, 'comentario', 14, 'Spam', 'captura27.png', 'pendiente', '2025-01-16 10:10:00'),
-(28, 29, 28, 'publicacion', 18, 'Contenido repetido', 'captura28.png', 'pendiente', '2025-01-16 10:15:00'),
-(29, 30, 29, 'comentario', 15, 'Comentario ofensivo', 'captura29.png', 'pendiente', '2025-01-16 10:20:00');
 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `seguidores_usuario`
+-- Estructura de tabla para la tabla `seguir_usuario`
 --
 
-CREATE TABLE `seguidores_usuario` (
+CREATE TABLE `seguir_usuario` (
   `id_seguimiento` int(11) NOT NULL,
-  `id_usuario` int(11) NOT NULL,
-  `id_seguidor` int(11) NOT NULL,
-  `fecha_seguimiento` datetime DEFAULT current_timestamp()
+  `id_seguidor` int(11) DEFAULT NULL,
+  `id_seguido` int(11) DEFAULT NULL,
+  `fecha_seguimiento` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Volcado de datos para la tabla `seguidores_usuario`
+-- Volcado de datos para la tabla `seguir_usuario`
 --
 
-INSERT INTO `seguidores_usuario` (`id_seguimiento`, `id_usuario`, `id_seguidor`, `fecha_seguimiento`) VALUES
-(1, 2, 1, '2025-01-10 08:00:00'),
-(2, 3, 1, '2025-01-10 08:10:00'),
-(3, 4, 2, '2025-01-10 08:15:00'),
-(4, 5, 2, '2025-01-10 08:20:00'),
-(5, 6, 3, '2025-01-10 08:30:00'),
-(6, 7, 3, '2025-01-10 08:35:00'),
-(7, 8, 4, '2025-01-10 08:45:00'),
-(8, 9, 5, '2025-01-10 08:50:00'),
-(9, 10, 6, '2025-01-10 09:00:00'),
-(10, 11, 7, '2025-01-10 09:05:00'),
-(11, 12, 8, '2025-01-10 09:10:00'),
-(12, 13, 9, '2025-01-10 09:15:00'),
-(13, 14, 10, '2025-01-10 09:20:00'),
-(14, 15, 11, '2025-01-10 09:30:00'),
-(15, 16, 12, '2025-01-10 09:35:00'),
-(16, 17, 13, '2025-01-10 09:40:00'),
-(17, 18, 14, '2025-01-10 09:45:00'),
-(18, 19, 15, '2025-01-10 10:00:00'),
-(19, 20, 16, '2025-01-10 10:10:00'),
-(20, 21, 17, '2025-01-10 10:20:00'),
-(21, 22, 18, '2025-01-10 10:30:00'),
-(22, 23, 19, '2025-01-10 10:40:00'),
-(23, 24, 21, '2025-01-10 10:50:00'),
-(24, 25, 14, '2025-01-10 11:00:00'),
-(25, 26, 12, '2025-01-10 11:10:00'),
-(26, 27, 10, '2025-01-10 11:20:00'),
-(27, 28, 20, '2025-01-10 11:30:00'),
-(28, 29, 24, '2025-01-10 11:40:00'),
-(29, 30, 29, '2025-01-10 11:55:00'),
-(30, 30, 10, '2025-01-10 11:55:00'),
-(31, 30, 28, '2025-01-10 11:55:00'),
-(32, 30, 1, '2025-01-10 08:00:00'),
-(33, 30, 2, '2025-01-10 08:01:00'),
-(34, 30, 3, '2025-01-10 08:02:00'),
-(35, 30, 4, '2025-01-10 08:03:00'),
-(36, 30, 5, '2025-01-10 08:04:00'),
-(37, 30, 6, '2025-01-10 08:05:00'),
-(38, 30, 7, '2025-01-10 08:06:00'),
-(39, 30, 8, '2025-01-10 08:07:00'),
-(40, 30, 9, '2025-01-10 08:08:00'),
-(41, 30, 10, '2025-01-10 08:09:00'),
-(42, 30, 11, '2025-01-10 08:10:00'),
-(43, 30, 12, '2025-01-10 08:11:00'),
-(44, 30, 13, '2025-01-10 08:12:00'),
-(45, 30, 14, '2025-01-10 08:13:00'),
-(46, 30, 15, '2025-01-10 08:14:00'),
-(47, 30, 16, '2025-01-10 08:15:00'),
-(48, 30, 17, '2025-01-10 08:16:00'),
-(49, 30, 18, '2025-01-10 08:17:00'),
-(50, 30, 19, '2025-01-10 08:18:00'),
-(51, 30, 20, '2025-01-10 08:19:00'),
-(52, 29, 1, '2025-01-10 08:20:00'),
-(53, 29, 2, '2025-01-10 08:21:00'),
-(54, 29, 3, '2025-01-10 08:22:00'),
-(55, 29, 4, '2025-01-10 08:23:00'),
-(56, 29, 5, '2025-01-10 08:24:00'),
-(57, 29, 6, '2025-01-10 08:25:00'),
-(58, 29, 7, '2025-01-10 08:26:00'),
-(59, 29, 8, '2025-01-10 08:27:00'),
-(60, 29, 9, '2025-01-10 08:28:00'),
-(61, 29, 10, '2025-01-10 08:29:00'),
-(62, 29, 11, '2025-01-10 08:30:00'),
-(63, 29, 12, '2025-01-10 08:31:00'),
-(64, 29, 13, '2025-01-10 08:32:00'),
-(65, 29, 14, '2025-01-10 08:33:00'),
-(66, 29, 15, '2025-01-10 08:34:00'),
-(67, 29, 16, '2025-01-10 08:35:00'),
-(68, 29, 17, '2025-01-10 08:36:00'),
-(69, 29, 18, '2025-01-10 08:37:00'),
-(70, 28, 1, '2025-01-10 08:38:00'),
-(71, 28, 2, '2025-01-10 08:39:00'),
-(72, 28, 3, '2025-01-10 08:40:00'),
-(73, 28, 4, '2025-01-10 08:41:00'),
-(74, 28, 5, '2025-01-10 08:42:00'),
-(75, 28, 6, '2025-01-10 08:43:00'),
-(76, 28, 7, '2025-01-10 08:44:00'),
-(77, 28, 8, '2025-01-10 08:45:00'),
-(78, 28, 9, '2025-01-10 08:46:00'),
-(79, 28, 10, '2025-01-10 08:47:00'),
-(80, 28, 11, '2025-01-10 08:48:00'),
-(81, 28, 12, '2025-01-10 08:49:00'),
-(82, 28, 13, '2025-01-10 08:50:00'),
-(83, 28, 14, '2025-01-10 08:51:00'),
-(84, 28, 15, '2025-01-10 08:52:00'),
-(85, 28, 16, '2025-01-10 08:53:00'),
-(86, 27, 1, '2025-01-10 08:54:00'),
-(87, 27, 2, '2025-01-10 08:55:00'),
-(88, 27, 3, '2025-01-10 08:56:00'),
-(89, 27, 4, '2025-01-10 08:57:00'),
-(90, 27, 5, '2025-01-10 08:58:00'),
-(91, 27, 6, '2025-01-10 08:59:00'),
-(92, 27, 7, '2025-01-10 09:00:00'),
-(93, 27, 8, '2025-01-10 09:01:00'),
-(94, 27, 9, '2025-01-10 09:02:00'),
-(95, 27, 10, '2025-01-10 09:03:00'),
-(96, 27, 11, '2025-01-10 09:04:00'),
-(97, 27, 12, '2025-01-10 09:05:00'),
-(98, 27, 13, '2025-01-10 09:06:00'),
-(99, 27, 14, '2025-01-10 09:07:00'),
-(100, 26, 1, '2025-01-10 09:08:00'),
-(101, 26, 2, '2025-01-10 09:09:00'),
-(102, 26, 3, '2025-01-10 09:10:00'),
-(103, 26, 4, '2025-01-10 09:11:00'),
-(104, 26, 5, '2025-01-10 09:12:00'),
-(105, 26, 6, '2025-01-10 09:13:00'),
-(106, 26, 7, '2025-01-10 09:14:00'),
-(107, 26, 8, '2025-01-10 09:15:00'),
-(108, 26, 9, '2025-01-10 09:16:00'),
-(109, 26, 10, '2025-01-10 09:17:00'),
-(110, 26, 11, '2025-01-10 09:18:00'),
-(111, 26, 12, '2025-01-10 09:19:00'),
-(112, 25, 1, '2025-01-10 09:20:00'),
-(113, 25, 2, '2025-01-10 09:21:00'),
-(114, 25, 3, '2025-01-10 09:22:00'),
-(115, 25, 4, '2025-01-10 09:23:00'),
-(116, 25, 5, '2025-01-10 09:24:00'),
-(117, 25, 6, '2025-01-10 09:25:00'),
-(118, 25, 7, '2025-01-10 09:26:00'),
-(119, 25, 8, '2025-01-10 09:27:00'),
-(120, 25, 9, '2025-01-10 09:28:00'),
-(121, 25, 10, '2025-01-10 09:29:00'),
-(122, 24, 1, '2025-01-10 09:30:00'),
-(123, 24, 2, '2025-01-10 09:31:00'),
-(124, 24, 3, '2025-01-10 09:32:00'),
-(125, 24, 4, '2025-01-10 09:33:00'),
-(126, 24, 5, '2025-01-10 09:34:00'),
-(127, 24, 6, '2025-01-10 09:35:00'),
-(128, 24, 7, '2025-01-10 09:36:00'),
-(129, 24, 8, '2025-01-10 09:37:00'),
-(130, 23, 1, '2025-01-10 09:38:00'),
-(131, 23, 2, '2025-01-10 09:39:00'),
-(132, 23, 3, '2025-01-10 09:40:00'),
-(133, 23, 4, '2025-01-10 09:41:00'),
-(134, 23, 5, '2025-01-10 09:42:00'),
-(135, 23, 6, '2025-01-10 09:43:00'),
-(136, 22, 1, '2025-01-10 09:44:00'),
-(137, 22, 2, '2025-01-10 09:45:00'),
-(138, 22, 3, '2025-01-10 09:46:00'),
-(139, 22, 4, '2025-01-10 09:47:00'),
-(140, 21, 1, '2025-01-10 09:48:00'),
-(141, 21, 2, '2025-01-10 09:49:00');
+INSERT INTO `seguir_usuario` (`id_seguimiento`, `id_seguidor`, `id_seguido`, `fecha_seguimiento`) VALUES
+(5, 56, 57, '2025-10-12 22:08:08'),
+(6, 1, 57, '2025-10-12 23:20:59'),
+(7, 56, 22, '2025-10-24 12:08:58'),
+(8, 1, 56, '2025-10-24 12:13:00'),
+(12, 57, 58, '2025-10-24 17:10:10'),
+(14, 56, 58, '2025-10-24 17:44:46'),
+(15, 57, 56, '2025-10-24 17:54:01'),
+(16, 58, 57, '2025-10-24 18:11:08'),
+(17, 58, 22, '2025-10-24 18:37:04');
 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `seguimiento_usuario`
+-- Estructura de tabla para la tabla `solicitud_de_amistad`
 --
 
-CREATE TABLE `seguimiento_usuario` (
-  `id` int(11) NOT NULL,
-  `id_usuario` int(11) NOT NULL,
-  `accion` varchar(255) DEFAULT NULL,
-  `detalle` text DEFAULT NULL,
-  `fecha` datetime DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `seguimiento_usuario`
---
-
-INSERT INTO `seguimiento_usuario` (`id`, `id_usuario`, `accion`, `detalle`, `fecha`) VALUES
-(1, 1, 'Inicio de sesión', 'Accedió desde Chrome', '2025-01-05 08:00:00'),
-(2, 2, 'Edición de perfil', 'Actualizó biografía', '2025-01-05 09:00:00'),
-(3, 3, 'Creación de obra', 'Publicó una pintura digital', '2025-01-05 10:00:00'),
-(4, 4, 'Comentario', 'Comentó en la obra #15', '2025-01-05 11:00:00'),
-(5, 5, 'Reacción', 'Le dio \"me encanta\" a una obra', '2025-01-05 12:00:00'),
-(6, 6, 'Guardado de obra', 'Guardó la obra #23', '2025-01-05 13:00:00'),
-(7, 7, 'Cambio de idioma', 'Cambió a inglés', '2025-01-05 14:00:00'),
-(8, 8, 'Mensaje privado', 'Envío a usuario #12', '2025-01-05 15:00:00'),
-(9, 9, 'Modificación de configuración', 'Activó modo oscuro', '2025-01-05 16:00:00'),
-(10, 10, 'Inicio de sesión', 'Accedió desde Firefox', '2025-01-05 17:00:00'),
-(11, 11, 'Publicación en blog', 'Creó un nuevo artículo', '2025-01-05 18:00:00'),
-(12, 12, 'Edición de obra', 'Cambió el título de la obra #8', '2025-01-05 19:00:00'),
-(13, 13, 'Creación de colección', 'Colección \"Mis favoritos\"', '2025-01-05 20:00:00'),
-(14, 14, 'Edición de configuración', 'Tamaño de fuente a grande', '2025-01-05 21:00:00'),
-(15, 15, 'Reacción', 'Le dio \"wow\" a un comentario', '2025-01-05 22:00:00'),
-(16, 16, 'Inicio de sesión', 'Desde dispositivo móvil', '2025-01-06 08:10:00'),
-(17, 17, 'Eliminación de obra', 'Obra #19 eliminada', '2025-01-06 08:20:00'),
-(18, 18, 'Suscripción a taller', 'Inscrito en taller de acuarela', '2025-01-06 08:30:00'),
-(19, 19, 'Cambio de contraseña', 'Por seguridad', '2025-01-06 08:40:00'),
-(20, 20, 'Comentario', 'Respondió a comentario #25', '2025-01-06 08:50:00'),
-(21, 21, 'Bloqueo de usuario', 'Bloqueó al usuario #17', '2025-01-06 09:00:00'),
-(22, 22, 'Desbloqueo de usuario', 'Desbloqueó al usuario #17', '2025-01-06 09:10:00'),
-(23, 23, 'Reporte de contenido', 'Reportó la obra #9', '2025-01-06 09:20:00'),
-(24, 24, 'Visualización de perfil', 'Vio perfil del usuario #14', '2025-01-06 09:30:00'),
-(25, 25, 'Cambio de privacidad', 'Perfil a \"solo_amigos\"', '2025-01-06 09:40:00'),
-(26, 26, 'Cambio de foto de perfil', 'Nueva imagen subida', '2025-01-06 09:50:00'),
-(27, 27, 'Cambio de preferencia', 'Ahora prefiere escultura', '2025-01-06 10:00:00'),
-(28, 28, 'Desbloqueo', 'Desbloqueó usuario #10', '2025-01-06 10:10:00'),
-(29, 29, 'Inicio de sesión', 'Desde IP desconocida', '2025-01-06 10:20:00'),
-(30, 30, 'Cambio de idioma', 'Cambió a portugués', '2025-01-06 10:30:00');
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `solicitudes_amistad`
---
-
-CREATE TABLE `solicitudes_amistad` (
-  `id` int(11) NOT NULL,
-  `usuario_id_origen` int(11) NOT NULL,
-  `usuario_id_destino` int(11) NOT NULL,
-  `estado` enum('pendiente','aceptada','rechazada') DEFAULT 'pendiente',
-  `fecha_envio` datetime NOT NULL,
-  `fecha_aceptacion` datetime DEFAULT NULL
+CREATE TABLE `solicitud_de_amistad` (
+  `id_solicitud` int(11) NOT NULL,
+  `id_emisor` int(11) DEFAULT NULL,
+  `id_receptor` int(11) DEFAULT NULL,
+  `estado` varchar(50) DEFAULT NULL,
+  `fecha_envio` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -1239,7 +964,7 @@ INSERT INTO `usuarios` (`id_usuario`, `nombre`, `apellido`, `correo_electronico`
 (19, 'Fernando Monasterio Cuesta', '', 'user19@correo.com', '93TwzE8!gHVu', '1983-09-09', 'Masculino', 'Danza', '+34 648 751 340', ''),
 (20, 'Tatiana Rojano Sáenz', '', 'user20@correo.com', 'fbvZHt$4MXq3', '1987-02-03', 'Femenino', 'Literatura', '+34 691 389 712', ''),
 (21, 'Ulises Naranjo Goicoechea', '', 'user21@correo.com', 'cJZW@yEL8N5*', '1989-04-22', 'Masculino', 'Teatro', '+34 618 451 913', ''),
-(22, 'Beatriz Luján Ochoa', '', 'user22@correo.com', 'F!qgTpbvWY7u', '1990-10-08', 'Femenino', 'Pintura', '+34 684 252 472', ''),
+(22, 'Beatriz Luján Ochoa', '', 'user22@correo.com', 'F!qgTpbvWY7u', '1990-10-08', 'Femenino', 'Pintura', '+34 684 252 472', 'si'),
 (23, 'Guillermo Lerín Santamaría', '', 'user23@correo.com', 'A@cvKz4YM3uP', '1981-06-03', 'Masculino', 'Danza', '+34 625 783 145', ''),
 (24, 'Natalia Cevallos Muñiz', '', 'user24@correo.com', 'Mf^yPzGu9EAK', '1993-01-25', 'Femenino', 'Música', '+34 672 423 987', 'sueño 201'),
 (25, 'Lázaro Fonseca Viñas', '', 'user25@correo.com', 'NctKv@pmW3R$', '1979-07-11', 'Masculino', 'Literatura', '+34 637 705 199', ''),
@@ -1251,7 +976,6 @@ INSERT INTO `usuarios` (`id_usuario`, `nombre`, `apellido`, `correo_electronico`
 (31, 'Ana Torres', '', 'ana.torres@example.com', 'pass123', '1995-04-12', 'Femenino', 'Pintura', '3001112233', ''),
 (32, 'Carlos Gómez', '', 'carlos.gomez@example.com', 'pass123', '1990-07-22', 'Masculino', 'Escultura', '3002223344', ''),
 (33, 'María López', '', 'maria.lopez@example.com', 'pass123', '1998-02-18', 'Femenino', 'Fotografía', '3003334455', ''),
-(34, 'Pedro Sánchez', '', 'pedro.sanchez@example.com', 'pass123', '1988-11-05', 'Masculino', 'Música', '3004445566', ''),
 (35, 'Lucía Fernández', '', 'lucia.fernandez@example.com', 'pass123', '1993-06-30', 'Femenino', 'Danza', '3005556677', ''),
 (36, 'David Morales', '', 'david.morales@example.com', 'pass123', '1992-01-15', 'Masculino', 'Poesía', '3006667788', ''),
 (37, 'Paula Ramírez', '', 'paula.ramirez@example.com', 'pass123', '1997-12-09', 'Femenino', 'Teatro', '3007778899', ''),
@@ -1262,7 +986,13 @@ INSERT INTO `usuarios` (`id_usuario`, `nombre`, `apellido`, `correo_electronico`
 (46, 'ozuna', 'Roldán', 'ozuna@test.com', '123456', '2000-05-20', 'femenino', 'pintura', '3201234567', 'ozunaR'),
 (49, 'nolan', 'sin ', 'wrf@gmail.com', '1234ewrt', '2025-09-15', 'Delfin', 'rock', '31431735', '57'),
 (51, 'artenity', 'sexo v', 'wtr.falso1@gmail.com', 'qa1122222', '2007-06-20', 'Hombre', 'jazz', '31232303546', 'wtr123'),
-(52, 'sebastian', 'reduro', 'sbd@gmail.com', 'sbd44', '2006-07-21', 'Hombre', 'jazz', '31232303543333', 'sbd33');
+(52, 'sebastian', 'reduro', 'sbd@gmail.com', 'sbd44', '2006-07-21', 'Hombre', 'jazz', '31232303543333', 'sbd33'),
+(53, 'anderson', 'dcdcdcd', 'cdcdcdcdc@gmail.com', 'cscscscsc', '2025-10-13', 'Hombre', 'circo', '3197255375', 'cscs'),
+(54, 'anderson', 'roldan', 'roldan@gmail.com', '12345', '2018-05-30', 'Hombre', 'dibujo', '314315545445', 'roldan'),
+(55, 'seba', 'rodriguez', 'seba@gmail.com', '123456', '2018-06-12', 'Hombre', 'circo', '65365436546354364', 'seba'),
+(56, 'wáter', 'sena2', 'anderson.17cardenas@gmail.com', '123456', '2010-10-06', 'Personalizado', 'circo', '223232323', 'and'),
+(57, 'witer365', 'real', 'anderson@gmail.com', '12345', '2006-07-09', 'Hombre', 'dibujo', '653654365463543645', 'witer365'),
+(58, 'Laura', 'Pérez', 'laura.perez@example.com', 'Laura123*', '1998-05-10', 'Mujer', 'pintura', '3005678910', 'laurapintora');
 
 -- --------------------------------------------------------
 
@@ -1316,6 +1046,14 @@ INSERT INTO `usuarios_bloqueados` (`id_bloqueo`, `id_usuario`, `id_bloqueado`, `
 --
 -- Índices para tablas volcadas
 --
+
+--
+-- Indices de la tabla `amistades`
+--
+ALTER TABLE `amistades`
+  ADD PRIMARY KEY (`id_amistad`),
+  ADD KEY `id_usuario1` (`id_usuario1`),
+  ADD KEY `id_usuario2` (`id_usuario2`);
 
 --
 -- Indices de la tabla `categorias_obra`
@@ -1399,14 +1137,15 @@ ALTER TABLE `mensajes_privados`
 --
 ALTER TABLE `notificaciones`
   ADD PRIMARY KEY (`id_notificacion`),
-  ADD KEY `id_usuario` (`id_usuario`);
+  ADD KEY `idx_id_usuario` (`id_usuario`);
 
 --
 -- Indices de la tabla `perfiles`
 --
 ALTER TABLE `perfiles`
   ADD PRIMARY KEY (`id_perfil`),
-  ADD KEY `id_usuario` (`id_usuario`);
+  ADD UNIQUE KEY `id_usuario` (`id_usuario`),
+  ADD KEY `idx_id_perfil` (`id_perfil`);
 
 --
 -- Indices de la tabla `preferencias_arte`
@@ -1423,14 +1162,6 @@ ALTER TABLE `publicaciones`
   ADD KEY `id_usuario` (`id_usuario`);
 
 --
--- Indices de la tabla `publicaciones_obra`
---
-ALTER TABLE `publicaciones_obra`
-  ADD PRIMARY KEY (`id_publicacion`),
-  ADD KEY `id_usuario` (`id_usuario`),
-  ADD KEY `id_categoria` (`id_categoria`);
-
---
 -- Indices de la tabla `registro_actividad`
 --
 ALTER TABLE `registro_actividad`
@@ -1438,35 +1169,31 @@ ALTER TABLE `registro_actividad`
   ADD KEY `id_usuario` (`id_usuario`);
 
 --
--- Indices de la tabla `reportes_contenido`
+-- Indices de la tabla `reportar_usuario`
 --
-ALTER TABLE `reportes_contenido`
+ALTER TABLE `reportar_usuario`
   ADD PRIMARY KEY (`id_reporte`),
-  ADD KEY `id_usuario_reportado` (`id_usuario_reportado`),
-  ADD KEY `id_usuario_reportante` (`id_usuario_reportante`);
+  ADD KEY `id_reportante` (`id_reportante`),
+  ADD KEY `id_reportado` (`id_reportado`),
+  ADD KEY `ix_reportar_usuario_id_reporte` (`id_reporte`);
 
 --
--- Indices de la tabla `seguidores_usuario`
+-- Indices de la tabla `seguir_usuario`
 --
-ALTER TABLE `seguidores_usuario`
+ALTER TABLE `seguir_usuario`
   ADD PRIMARY KEY (`id_seguimiento`),
-  ADD KEY `id_usuario` (`id_usuario`),
-  ADD KEY `id_seguidor` (`id_seguidor`);
+  ADD KEY `id_seguidor` (`id_seguidor`),
+  ADD KEY `id_seguido` (`id_seguido`),
+  ADD KEY `ix_seguir_usuario_id_seguimiento` (`id_seguimiento`);
 
 --
--- Indices de la tabla `seguimiento_usuario`
+-- Indices de la tabla `solicitud_de_amistad`
 --
-ALTER TABLE `seguimiento_usuario`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `id_usuario` (`id_usuario`);
-
---
--- Indices de la tabla `solicitudes_amistad`
---
-ALTER TABLE `solicitudes_amistad`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `usuario_id_origen` (`usuario_id_origen`),
-  ADD KEY `usuario_id_destino` (`usuario_id_destino`);
+ALTER TABLE `solicitud_de_amistad`
+  ADD PRIMARY KEY (`id_solicitud`),
+  ADD KEY `id_emisor` (`id_emisor`),
+  ADD KEY `id_receptor` (`id_receptor`),
+  ADD KEY `ix_solicitud_de_amistad_id_solicitud` (`id_solicitud`);
 
 --
 -- Indices de la tabla `usuarios`
@@ -1487,26 +1214,96 @@ ALTER TABLE `usuarios_bloqueados`
 --
 
 --
+-- AUTO_INCREMENT de la tabla `amistades`
+--
+ALTER TABLE `amistades`
+  MODIFY `id_amistad` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT de la tabla `notificaciones`
+--
+ALTER TABLE `notificaciones`
+  MODIFY `id_notificacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
+
+--
+-- AUTO_INCREMENT de la tabla `perfiles`
+--
+ALTER TABLE `perfiles`
+  MODIFY `id_perfil` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
+
+--
 -- AUTO_INCREMENT de la tabla `publicaciones`
 --
 ALTER TABLE `publicaciones`
-  MODIFY `id_publicacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id_publicacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+
+--
+-- AUTO_INCREMENT de la tabla `reportar_usuario`
+--
+ALTER TABLE `reportar_usuario`
+  MODIFY `id_reporte` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `seguir_usuario`
+--
+ALTER TABLE `seguir_usuario`
+  MODIFY `id_seguimiento` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+
+--
+-- AUTO_INCREMENT de la tabla `solicitud_de_amistad`
+--
+ALTER TABLE `solicitud_de_amistad`
+  MODIFY `id_solicitud` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
+  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
 
 --
 -- Restricciones para tablas volcadas
 --
 
 --
+-- Filtros para la tabla `amistades`
+--
+ALTER TABLE `amistades`
+  ADD CONSTRAINT `amistades_ibfk_1` FOREIGN KEY (`id_usuario1`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE,
+  ADD CONSTRAINT `amistades_ibfk_2` FOREIGN KEY (`id_usuario2`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `perfiles`
+--
+ALTER TABLE `perfiles`
+  ADD CONSTRAINT `fk_perfiles_usuarios` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
 -- Filtros para la tabla `publicaciones`
 --
 ALTER TABLE `publicaciones`
   ADD CONSTRAINT `publicaciones_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`);
+
+--
+-- Filtros para la tabla `reportar_usuario`
+--
+ALTER TABLE `reportar_usuario`
+  ADD CONSTRAINT `reportar_usuario_ibfk_1` FOREIGN KEY (`id_reportante`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE,
+  ADD CONSTRAINT `reportar_usuario_ibfk_2` FOREIGN KEY (`id_reportado`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `seguir_usuario`
+--
+ALTER TABLE `seguir_usuario`
+  ADD CONSTRAINT `seguir_usuario_ibfk_1` FOREIGN KEY (`id_seguidor`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE,
+  ADD CONSTRAINT `seguir_usuario_ibfk_2` FOREIGN KEY (`id_seguido`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `solicitud_de_amistad`
+--
+ALTER TABLE `solicitud_de_amistad`
+  ADD CONSTRAINT `solicitud_de_amistad_ibfk_1` FOREIGN KEY (`id_emisor`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE,
+  ADD CONSTRAINT `solicitud_de_amistad_ibfk_2` FOREIGN KEY (`id_receptor`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

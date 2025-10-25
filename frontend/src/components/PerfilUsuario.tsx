@@ -44,14 +44,15 @@ export default function PerfilUsuario() {
     }
   };
 
-  const cargarAmigos = async (idUsuario: number) => {
-    try {
-      const amigosData = await getAmigos();
-      setAmigos(amigosData);
-    } catch (error) {
-      console.error("Error cargando amigos:", error);
-    }
-  };
+ const cargarAmigos = async (idUsuario: number) => {
+  try {
+    const amigosData = await getAmigos(idUsuario);
+    setAmigos(amigosData);
+  } catch (error) {
+    console.error("Error cargando amigos:", error);
+  }
+};
+
 
   const handleSeguir = async () => {
     if (!id) return;
