@@ -300,17 +300,17 @@ def enviar_solicitud_amistad(
     if id_receptor == user_id:
         raise HTTPException(status_code=400, detail="No puedes enviarte una solicitud a ti mismo")
 
-    # 🔹 1. Revisar si ya son amigos
-    ya_amigos = db.query(models.SolicitudAmistad).filter(
-        ((models.SolicitudAmistad.id_emisor == user_id) & (models.SolicitudAmistad.id_receptor == id_receptor)) |
-        ((models.SolicitudAmistad.id_emisor == id_receptor) & (models.SolicitudAmistad.id_receptor == user_id)),
-        models.SolicitudAmistad.estado == "aceptada"
+    # 🔹 1. Revisar si ya son amigos (tabla Amistad)
+    ya_amigos = db.query(models.Amistad).filter(
+        ((models.Amistad.id_usuario1 == user_id) & (models.Amistad.id_usuario2 == id_receptor)) |
+        ((models.Amistad.id_usuario1 == id_receptor) & (models.Amistad.id_usuario2 == user_id)),
+        models.Amistad.estado == "aceptada"
     ).first()
 
     if ya_amigos:
         raise HTTPException(status_code=400, detail="Ya son amigos, no puedes enviar otra solicitud")
 
-    # 🔹 2. Revisar si hay una solicitud pendiente
+    # 🔹 2. Revisar si ya hay una solicitud pendiente
     existente = db.query(models.SolicitudAmistad).filter(
         ((models.SolicitudAmistad.id_emisor == user_id) & (models.SolicitudAmistad.id_receptor == id_receptor)) |
         ((models.SolicitudAmistad.id_emisor == id_receptor) & (models.SolicitudAmistad.id_receptor == user_id)),
@@ -320,13 +320,13 @@ def enviar_solicitud_amistad(
     if existente:
         raise HTTPException(status_code=400, detail="Ya existe una solicitud pendiente entre ustedes")
 
-    # 🔹 3. Crear nueva solicitud si no hay amistad ni solicitud pendiente
+    # 🔹 3. Crear la solicitud
     nueva = models.SolicitudAmistad(id_emisor=user_id, id_receptor=id_receptor)
     db.add(nueva)
     db.commit()
     db.refresh(nueva)
 
-    # 🔹 4. Crear notificación al receptor
+    # 🔹 4. Crear notificación
     emisor = db.query(models.Usuario).filter(models.Usuario.id_usuario == user_id).first()
     noti = models.Notificacion(
         id_usuario=id_receptor,
@@ -491,20 +491,18 @@ def eliminar_amigo(
     user_id: int = Depends(get_current_user_id)
 ):
     """
-    Elimina la relación de amistad entre el usuario actual y otro usuario (id_amigo).
+    Elimina la relación de amistad entre el usuario actual y otro usuario.
     """
-    solicitud = db.query(models.SolicitudAmistad).filter(
-        (
-            ((models.SolicitudAmistad.id_emisor == user_id) & (models.SolicitudAmistad.id_receptor == id_amigo)) |
-            ((models.SolicitudAmistad.id_emisor == id_amigo) & (models.SolicitudAmistad.id_receptor == user_id))
-        ) &
-        (models.SolicitudAmistad.estado == "aceptada")
+    amistad = db.query(models.Amistad).filter(
+        ((models.Amistad.id_usuario1 == user_id) & (models.Amistad.id_usuario2 == id_amigo)) |
+        ((models.Amistad.id_usuario1 == id_amigo) & (models.Amistad.id_usuario2 == user_id)),
+        models.Amistad.estado == "aceptada"
     ).first()
 
-    if not solicitud:
+    if not amistad:
         raise HTTPException(status_code=404, detail="No existe relación de amistad con este usuario")
 
-    db.delete(solicitud)
+    db.delete(amistad)
     db.commit()
 
     return {"mensaje": f"Has eliminado a {id_amigo} de tu lista de amigos"}
