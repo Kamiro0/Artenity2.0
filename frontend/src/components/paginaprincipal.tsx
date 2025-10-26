@@ -1,6 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Home, Compass, Grid, MessageSquare, Settings, Image } from "lucide-react";
+import {
+  Home,
+  Compass,
+  Grid,
+  MessageSquare,
+  Settings,
+  Image,
+} from "lucide-react";
 import "../styles/paginaprincipal.css";
 import defaultProfile from "../assets/img/fotoperfildefault.jpg";
 import { getPublicaciones, crearPublicacion } from "../services/api";
@@ -15,8 +22,7 @@ export default function PaginaPrincipal() {
   const [contenido, setContenido] = useState("");
   const [file, setFile] = useState<File | null>(null);
 
-  
-  // Añadir clase al body
+  // ✅ Añadir clase al body
   useEffect(() => {
     document.body.classList.add("pagina-principal");
     return () => {
@@ -24,17 +30,48 @@ export default function PaginaPrincipal() {
     };
   }, []);
 
-  // Cargar publicaciones
+  // ✅ Cargar publicaciones
+  const cargarPublicaciones = async () => {
+    try {
+      const posts = await getPublicaciones();
+      // Agregar timestamp a las fotos para evitar caché
+      const postsConFotosActualizadas = posts.map((p: any) => ({
+        ...p,
+        usuario: {
+          ...p.usuario,
+          perfil: p.usuario?.perfil
+            ? {
+                ...p.usuario.perfil,
+                foto_perfil: p.usuario.perfil.foto_perfil
+                  ? `${p.usuario.perfil.foto_perfil}?t=${new Date().getTime()}`
+                  : defaultProfile,
+              }
+            : null,
+        },
+      }));
+      setPublicaciones(postsConFotosActualizadas);
+    } catch (error) {
+      console.error("Error cargando publicaciones:", error);
+    }
+  };
+
   useEffect(() => {
     cargarPublicaciones();
   }, []);
 
-  const cargarPublicaciones = async () => {
-    const posts = await getPublicaciones();
-    setPublicaciones(posts);
-  };
+  // ✅ Actualizar publicaciones cuando cambie una foto de perfil
+  useEffect(() => {
+    const handleFotoActualizada = () => {
+      cargarPublicaciones();
+    };
 
-  // Crear publicación
+    window.addEventListener("fotoPerfilActualizada", handleFotoActualizada);
+    return () => {
+      window.removeEventListener("fotoPerfilActualizada", handleFotoActualizada);
+    };
+  }, []);
+
+  // ✅ Crear publicación
   const handlePost = async () => {
     if (!contenido.trim() && !file) return;
 
@@ -43,13 +80,17 @@ export default function PaginaPrincipal() {
     data.append("contenido", contenido);
     if (file) data.append("file", file);
 
-    await crearPublicacion(data);
-    setContenido("");
-    setFile(null);
-    await cargarPublicaciones();
+    try {
+      await crearPublicacion(data);
+      setContenido("");
+      setFile(null);
+      await cargarPublicaciones();
+    } catch (error) {
+      console.error("Error creando publicación:", error);
+    }
   };
 
-  // Cerrar sesión
+  // ✅ Cerrar sesión
   const handleLogout = () => {
     localStorage.removeItem("token");
     window.location.href = "/login";
@@ -66,13 +107,19 @@ export default function PaginaPrincipal() {
         {/* Perfil del usuario autenticado */}
         <button className="img-btn" onClick={() => navigate("/perfil")}>
           <img
-          src={usuario?.foto_perfil || defaultProfile}
-          alt="perfil"
-          className="perfiles perfiles-topbar"
-       />
+            src={
+              usuario?.foto_perfil
+                ? `${usuario.foto_perfil}?t=${new Date().getTime()}`
+                : defaultProfile
+            }
+            alt="perfil"
+            className="perfiles perfiles-topbar"
+          />
         </button>
 
-        <button className="icon-btn" onClick={handleLogout}>⏻</button>
+        <button className="icon-btn" onClick={handleLogout}>
+          ⏻
+        </button>
       </div>
 
       {/* 🔹 Sidebar izquierda */}
@@ -80,17 +127,33 @@ export default function PaginaPrincipal() {
         <div>
           <div className="text-center text-2xl font-bold mb-8">🎨 Artenity</div>
           <nav className="space-y-4">
-            <button className="nav-btn" onClick={() => navigate("/principal")}><Home /> Home</button>
-            <button className="nav-btn"><Compass /> Explorar</button>
-            <button className="nav-btn"><Grid /> Categorías</button>
-            <button className="nav-btn" onClick={() => navigate("/mensajes")}><MessageSquare /> Mensajes</button>
-            <button className="nav-btn"><Settings /> Configuración</button>
-            <button className="nav-btn"><Image /> Galería de Arte</button>
+            <button className="nav-btn" onClick={() => navigate("/principal")}>
+              <Home /> Home
+            </button>
+            <button className="nav-btn">
+              <Compass /> Explorar
+            </button>
+            <button className="nav-btn">
+              <Grid /> Categorías
+            </button>
+            <button className="nav-btn" onClick={() => navigate("/mensajes")}>
+              <MessageSquare /> Mensajes
+            </button>
+            <button className="nav-btn">
+              <Settings /> Configuración
+            </button>
+            <button className="nav-btn">
+              <Image /> Galería de Arte
+            </button>
           </nav>
         </div>
 
-        <button className="post-btn mt-8" onClick={handlePost}>PUBLICAR</button>
-        <button className="post-btn mt-4" onClick={handleLogout}>CERRAR SESIÓN</button>
+        <button className="post-btn mt-8" onClick={handlePost}>
+          PUBLICAR
+        </button>
+        <button className="post-btn mt-4" onClick={handleLogout}>
+          CERRAR SESIÓN
+        </button>
       </aside>
 
       {/* 🔹 Sección central */}
@@ -123,11 +186,15 @@ export default function PaginaPrincipal() {
         <div className="posts">
           {publicaciones.map((post) => (
             <div key={post.id_publicacion} className="post-card">
-              {/* Header del post (perfil del usuario autor) */}
+              {/* Header del post */}
               <div className="post-header">
                 <Link to={`/usuario/${post.usuario?.id_usuario}`}>
                   <img
-                    src={post.usuario?.perfil?.foto_perfil || defaultProfile}
+                    src={
+                      post.usuario?.perfil?.foto_perfil
+                        ? `${post.usuario.perfil.foto_perfil}?t=${new Date().getTime()}`
+                        : defaultProfile
+                    }
                     alt="foto de perfil"
                     className="perfiles perfiles-topbar"
                   />
@@ -164,9 +231,15 @@ export default function PaginaPrincipal() {
 
       {/* 🔹 Sidebar derecha */}
       <aside className="right-sidebar">
-        <div className="card"><h2>COMUNIDADES A SEGUIR</h2></div>
-        <div className="card"><h2>LO QUE SUCEDE CON EL MUNDO DEL ARTE</h2></div>
-        <div className="card"><h2>A QUIÉN SEGUIR</h2></div>
+        <div className="card">
+          <h2>COMUNIDADES A SEGUIR</h2>
+        </div>
+        <div className="card">
+          <h2>LO QUE SUCEDE CON EL MUNDO DEL ARTE</h2>
+        </div>
+        <div className="card">
+          <h2>A QUIÉN SEGUIR</h2>
+        </div>
       </aside>
     </div>
   );

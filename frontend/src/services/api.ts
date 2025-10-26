@@ -207,3 +207,27 @@ export async function obtenerCategorias() {
 export const getSolicitudesAmistad = obtenerSolicitudesPendientes;
 export const getAmigos = obtenerAmigos;
 export const getCategorias = obtenerCategorias;
+
+
+
+// ======== SEGUIDORES Y SIGUIENDO ========
+export async function obtenerSiguiendo() {
+  const res = await api.get("/siguiendo", {
+    headers: { token: getToken(), id_usuario: getUsuarioId() },
+  });
+  return res.data;
+}
+
+export async function obtenerEstadisticasPerfil(id_usuario: number) {
+  const res = await api.get(`/estadisticas-perfil/${id_usuario}`, {
+    headers: { token: getToken() },
+  });
+  return res.data;
+}
+
+export async function obtenerPublicacionesUsuario(id_usuario: number) {
+  const res = await api.get(`/publicaciones-usuario/${id_usuario}`, {
+    headers: { token: getToken() },
+  });
+  return res.data;
+}

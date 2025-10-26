@@ -69,3 +69,28 @@ class NotificacionResponse(BaseModel):
 
     class Config:
         orm_mode = True
+
+# Agregar al final de backend/schemas.py
+
+# ------------------ SEGUIDORES / SIGUIENDO ------------------
+class SeguidorResponse(BaseModel):
+    id_seguimiento: int
+    fecha_seguimiento: datetime
+    seguidor: UsuarioPerfil
+
+class SeguidoResponse(BaseModel):
+    id_seguimiento: int
+    fecha_seguimiento: datetime
+    seguido: UsuarioPerfil
+
+    class Config:
+        orm_mode = True
+
+# ------------------ ESTADÍSTICAS PERFIL ------------------
+class EstadisticasPerfilResponse(BaseModel):
+    seguidores: int
+    siguiendo: int
+    publicaciones: int
+
+    class Config:
+        orm_mode = True

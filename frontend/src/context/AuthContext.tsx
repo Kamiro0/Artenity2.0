@@ -1,3 +1,4 @@
+// context/AuthContext.tsx
 import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { getPerfil } from "../services/api";
 
@@ -14,6 +15,8 @@ interface AuthContextType {
   token: string | null;
   login: (token: string, usuario: Usuario) => void;
   logout: () => void;
+  actualizarFotoPerfil: (nuevaFoto: string) => void;
+  forzarActualizacionPerfil: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -21,8 +24,9 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  const [actualizacion, setActualizacion] = useState(0);
 
-  // 🧠 Cargar datos guardados en localStorage al iniciar
+  // 🧠 Cargar datos guardados al iniciar
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
     const storedUsuario = localStorage.getItem("usuario");
@@ -32,35 +36,41 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const parsedUser = JSON.parse(storedUsuario);
       setUsuario(parsedUser);
 
-      // 🔄 Actualizar foto de perfil desde el backend
       if (parsedUser?.id_usuario && storedToken) {
         getPerfil(parsedUser.id_usuario)
           .then((perfilData) => {
-            const updatedUser = { ...parsedUser, foto_perfil: perfilData.foto_perfil };
-            setUsuario(updatedUser);
-            localStorage.setItem("usuario", JSON.stringify(updatedUser));
+            let nuevaFoto = perfilData.foto_perfil || parsedUser.foto_perfil;
+            if (nuevaFoto) nuevaFoto = `${nuevaFoto}?t=${new Date().getTime()}`;
+
+            const usuarioActualizado = { ...parsedUser, foto_perfil: nuevaFoto };
+            setUsuario(usuarioActualizado);
+            localStorage.setItem("usuario", JSON.stringify(usuarioActualizado));
           })
           .catch((err) => console.error("Error al cargar perfil:", err));
       }
     }
   }, []);
 
+  // 🟢 Login
   const login = (newToken: string, newUsuario: Usuario) => {
     setToken(newToken);
     setUsuario(newUsuario);
     localStorage.setItem("token", newToken);
     localStorage.setItem("usuario", JSON.stringify(newUsuario));
 
-    // 🔄 Obtener foto de perfil más reciente después del login
     getPerfil(newUsuario.id_usuario)
       .then((perfilData) => {
-        const updatedUser = { ...newUsuario, foto_perfil: perfilData.foto_perfil };
-        setUsuario(updatedUser);
-        localStorage.setItem("usuario", JSON.stringify(updatedUser));
+        let nuevaFoto = perfilData.foto_perfil || newUsuario.foto_perfil;
+        if (nuevaFoto) nuevaFoto = `${nuevaFoto}?t=${new Date().getTime()}`;
+
+        const usuarioActualizado = { ...newUsuario, foto_perfil: nuevaFoto };
+        setUsuario(usuarioActualizado);
+        localStorage.setItem("usuario", JSON.stringify(usuarioActualizado));
       })
       .catch((err) => console.error("Error al actualizar perfil tras login:", err));
   };
 
+  // 🔴 Logout
   const logout = () => {
     setToken(null);
     setUsuario(null);
@@ -68,8 +78,46 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem("usuario");
   };
 
+  // 🖼️ Actualizar foto de perfil localmente
+  const actualizarFotoPerfil = (nuevaFoto: string) => {
+    if (usuario) {
+      const fotoConTimestamp = `${nuevaFoto}?t=${new Date().getTime()}`;
+      const usuarioActualizado = { ...usuario, foto_perfil: fotoConTimestamp };
+      setUsuario(usuarioActualizado);
+      localStorage.setItem("usuario", JSON.stringify(usuarioActualizado));
+      setActualizacion((prev) => prev + 1);
+    }
+  };
+
+  // 🔄 Forzar actualización del perfil desde el backend
+  const forzarActualizacionPerfil = () => {
+    if (usuario?.id_usuario && token) {
+      getPerfil(usuario.id_usuario)
+        .then((perfilData) => {
+          let nuevaFoto = perfilData.foto_perfil || usuario.foto_perfil;
+          if (nuevaFoto) nuevaFoto = `${nuevaFoto}?t=${new Date().getTime()}`;
+
+          const usuarioActualizado = { ...usuario, foto_perfil: nuevaFoto };
+          setUsuario(usuarioActualizado);
+          localStorage.setItem("usuario", JSON.stringify(usuarioActualizado));
+          setActualizacion((prev) => prev + 1);
+        })
+        .catch((err) => console.error("Error al forzar actualización:", err));
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ usuario, setUsuario, token, login, logout }}>
+    <AuthContext.Provider
+      value={{
+        usuario,
+        setUsuario,
+        token,
+        login,
+        logout,
+        actualizarFotoPerfil,
+        forzarActualizacionPerfil,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

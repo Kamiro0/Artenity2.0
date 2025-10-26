@@ -8,42 +8,37 @@ from pydantic import BaseModel, EmailStr
 from typing import List
 from datetime import datetime
 import os
+import shutil
 
 app = FastAPI()
 
 # ------------------ CORS ------------------
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["http://localhost:5173", "http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# ------------------ Static Files ------------------
+# ------------------ STATIC FILES ------------------
 os.makedirs("static/perfiles", exist_ok=True)
 os.makedirs("static/posts", exist_ok=True)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# ------------------ Crear tablas ------------------
+# ------------------ CREAR TABLAS ------------------
 models.Base.metadata.create_all(bind=database.engine)
 
-
+# ------------------ AUTENTICACIÓN SIMPLIFICADA ------------------
 def get_current_user_id(
     token: str = Header(..., alias="token"),
     user_id: int = Header(None, alias="id_usuario"),
     db: Session = Depends(get_db)
 ) -> int:
-    """
-    Autenticación simulada: usa token + id_usuario.
-    En producción, reemplazar por validación JWT.
-    """
     if not token:
         raise HTTPException(status_code=401, detail="Token requerido")
-
     if token != "fake-token":
         raise HTTPException(status_code=401, detail="Token inválido")
-
     if not user_id:
         raise HTTPException(status_code=400, detail="ID de usuario no proporcionado")
 
@@ -52,7 +47,6 @@ def get_current_user_id(
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
     return usuario.id_usuario
-
 
 # ------------------ USUARIOS ------------------
 @app.post("/usuarios", response_model=schemas.UsuarioResponse)
@@ -68,9 +62,11 @@ def create_usuario(usuario: schemas.UsuarioCreate, db: Session = Depends(get_db)
 
     return nuevo_usuario
 
+
 @app.get("/usuarios", response_model=List[schemas.UsuarioResponse])
 def get_usuarios(db: Session = Depends(get_db)):
     return db.query(models.Usuario).all()
+
 
 @app.delete("/usuarios/{usuario_id}", response_model=schemas.UsuarioResponse)
 def delete_usuario(usuario_id: int, db: Session = Depends(get_db)):
@@ -123,7 +119,7 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
 def obtener_perfil(
     id_usuario: int,
     db: Session = Depends(get_db),
-    user_id: int = Depends(get_current_user_id)  # 👈 se obtiene el usuario autenticado
+    user_id: int = Depends(get_current_user_id)
 ):
     perfil = db.query(models.Perfil).filter(models.Perfil.id_usuario == id_usuario).first()
     if not perfil:
@@ -132,7 +128,6 @@ def obtener_perfil(
         db.commit()
         db.refresh(perfil)
 
-    # Verificar si el usuario actual sigue a este perfil
     sigue = db.query(models.SeguirUsuario).filter(
         models.SeguirUsuario.id_seguidor == user_id,
         models.SeguirUsuario.id_seguido == id_usuario
@@ -146,7 +141,7 @@ def obtener_perfil(
         "descripcion": perfil.descripcion,
         "biografia": perfil.biografia,
         "foto_perfil": perfil.foto_perfil,
-        "sigo": bool(sigue),  # 👈 nuevo campo
+        "sigo": bool(sigue),
         "usuario": {
             "nombre": usuario.nombre,
             "apellido": usuario.apellido,
@@ -176,16 +171,25 @@ async def actualizar_perfil(
 
     if file and file.filename:
         os.makedirs("static/perfiles", exist_ok=True)
-        ext = file.filename.split(".")[-1]
-        filename = f"perfil_{id_usuario}.{ext}"
-        ruta = os.path.join("static/perfiles", filename)
-        with open(ruta, "wb") as f:
-            f.write(await file.read())
+    
+        timestamp = int(datetime.now().timestamp())
+        filename = f"perfil_{id_usuario}_{timestamp}.jpg"
+        file_path = os.path.join("static/perfiles", filename)
+
+        for archivo in os.listdir("static/perfiles"):
+            if archivo.startswith(f"perfil_{id_usuario}_"):
+                os.remove(os.path.join("static/perfiles", archivo))
+
+
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+
         perfil.foto_perfil = f"http://localhost:8000/static/perfiles/{filename}"
 
     db.commit()
     db.refresh(perfil)
     return perfil
+
 
 # ------------------ PUBLICACIONES ------------------
 @app.get("/publicaciones", response_model=List[schemas.PublicacionResponse])
@@ -545,6 +549,61 @@ def marcar_notificaciones_leidas(
     db.commit()
     return {"mensaje": f"{len(notificaciones)} notificaciones marcadas como leídas"}
 
+# Agregar después del endpoint de seguidores existente
+
+# ------------------ OBTENER USUARIOS SEGUIDOS ------------------
+@app.get("/siguiendo")
+def obtener_siguiendo(db: Session = Depends(get_db), user_id: int = Depends(get_current_user_id)):
+    siguiendo = db.query(models.SeguirUsuario).filter(models.SeguirUsuario.id_seguidor == user_id).all()
+
+    resultado = []
+    for seg in siguiendo:
+        seguido = db.query(models.Usuario).filter(models.Usuario.id_usuario == seg.id_seguido).first()
+        perfil = db.query(models.Perfil).filter(models.Perfil.id_usuario == seg.id_seguido).first()
+        resultado.append({
+            "id_seguimiento": seg.id_seguimiento,
+            "fecha_seguimiento": seg.fecha_seguimiento,
+            "seguido": {
+                "id_usuario": seguido.id_usuario,
+                "nombre_usuario": seguido.nombre_usuario,
+                "foto_perfil": perfil.foto_perfil if perfil else None
+            }
+        })
+    return resultado
+
+# ------------------ OBTENER ESTADÍSTICAS DEL PERFIL ------------------
+@app.get("/estadisticas-perfil/{id_usuario}")
+def obtener_estadisticas_perfil(id_usuario: int, db: Session = Depends(get_db)):
+    # Contar seguidores
+    seguidores = db.query(models.SeguirUsuario).filter(
+        models.SeguirUsuario.id_seguido == id_usuario
+    ).count()
+
+    # Contar usuarios que sigue
+    siguiendo = db.query(models.SeguirUsuario).filter(
+        models.SeguirUsuario.id_seguidor == id_usuario
+    ).count()
+
+    # Contar publicaciones
+    publicaciones = db.query(models.Publicacion).filter(
+        models.Publicacion.id_usuario == id_usuario
+    ).count()
+
+    return {
+        "seguidores": seguidores,
+        "siguiendo": siguiendo,
+        "publicaciones": publicaciones
+    }
+
+# ------------------ OBTENER PUBLICACIONES DE USUARIO ESPECÍFICO ------------------
+@app.get("/publicaciones-usuario/{id_usuario}")
+def obtener_publicaciones_usuario(id_usuario: int, db: Session = Depends(get_db)):
+    publicaciones = db.query(models.Publicacion)\
+        .options(joinedload(models.Publicacion.usuario).joinedload(models.Usuario.perfil))\
+        .filter(models.Publicacion.id_usuario == id_usuario)\
+        .order_by(models.Publicacion.fecha_creacion.desc())\
+        .all()
+    return publicaciones
 
 # ------------------ HOME ------------------
 @app.get("/home")
