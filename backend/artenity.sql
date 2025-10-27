@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 25-10-2025 a las 22:57:03
+-- Tiempo de generación: 27-10-2025 a las 23:18:00
 -- Versión del servidor: 10.4.32-MariaDB
--- Versión de PHP: 8.0.30
+-- Versión de PHP: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -645,7 +645,12 @@ INSERT INTO `notificaciones` (`id_notificacion`, `id_usuario`, `mensaje`, `leido
 (41, 58, 'witer365 te ha enviado una solicitud de amistad', 1, '2025-10-25 20:54:27', 'solicitud_amistad', 16),
 (42, 57, 'laurapintora aceptó tu solicitud de amistad', 1, '2025-10-25 20:54:56', 'amistad_aceptada', 16),
 (43, 58, 'ozuna el real te ha enviado una solicitud de amistad', 1, '2025-10-25 20:55:53', 'solicitud_amistad', 17),
-(44, 1, 'laurapintora aceptó tu solicitud de amistad', 0, '2025-10-25 20:56:10', 'amistad_aceptada', 17);
+(44, 1, 'laurapintora aceptó tu solicitud de amistad', 0, '2025-10-25 20:56:10', 'amistad_aceptada', 17),
+(45, 58, 'witer365 comenzó a seguirte', 1, '2025-10-26 20:21:38', 'nuevo_seguidor', 18),
+(46, 57, 'seba comenzó a seguirte', 1, '2025-10-26 22:15:04', 'nuevo_seguidor', 19),
+(47, 57, 'seba comenzó a seguirte', 1, '2025-10-26 22:16:21', 'nuevo_seguidor', 20),
+(48, 55, 'witer365 comenzó a seguirte', 0, '2025-10-26 23:11:29', 'nuevo_seguidor', 21),
+(49, 49, 'witer365 comenzó a seguirte', 0, '2025-10-27 18:40:39', 'nuevo_seguidor', 22);
 
 -- --------------------------------------------------------
 
@@ -667,7 +672,7 @@ CREATE TABLE `perfiles` (
 
 INSERT INTO `perfiles` (`id_perfil`, `id_usuario`, `descripcion`, `foto_perfil`, `biografia`) VALUES
 (1, 1, NULL, 'http://localhost:8000/static/perfiles/perfil_1.jpg', NULL),
-(2, 2, NULL, NULL, NULL),
+(2, 2, NULL, 'http://localhost:8000/static/perfiles/perfil_2.jpg', NULL),
 (3, 3, NULL, NULL, NULL),
 (4, 4, NULL, NULL, NULL),
 (5, 5, NULL, NULL, NULL),
@@ -712,10 +717,10 @@ INSERT INTO `perfiles` (`id_perfil`, `id_usuario`, `descripcion`, `foto_perfil`,
 (45, 52, NULL, NULL, NULL),
 (46, 53, NULL, NULL, NULL),
 (47, 54, NULL, NULL, NULL),
-(48, 55, NULL, NULL, NULL),
+(48, 55, NULL, 'http://localhost:8000/static/perfiles/perfil_55_1761516857.jpg', NULL),
 (49, 56, 'tan poco se', 'http://localhost:8000/static/perfiles/perfil_56.avif', 'me gusta el arte y dormir'),
-(50, 57, 'me gusta dormir', 'http://localhost:8000/static/perfiles/perfil_57.jpg', 'tengo hambre'),
-(51, 58, '\"Artista digital especializado en surrealismo moderno.\"', 'http://localhost:8000/static/perfiles/perfil_58.jpg', '\"Desde 2015 exploro el arte digital fusionando elementos de fantasía y tecnología.\"');
+(50, 57, 'me gusta dormir', 'http://localhost:8000/static/perfiles/perfil_57_1761521103.jpg', 'tengo hambre'),
+(51, 58, '\"Artista digital especializado en surrealismo moderno.\"', 'http://localhost:8000/static/perfiles/perfil_58_1761516762.jpg', '\"Desde 2015 exploro el arte digital fusionando elementos de fantasía y tecnología.\"');
 
 -- --------------------------------------------------------
 
@@ -811,7 +816,10 @@ INSERT INTO `publicaciones` (`id_publicacion`, `id_usuario`, `contenido`, `image
 (15, 57, 'bvbvbvb', 'http://localhost:8000/static/posts/57_2.jpg', '2025-10-11 20:27:39'),
 (16, 56, 'vhgghg', 'http://localhost:8000/static/posts/56_3.jpg', '2025-10-11 23:10:03'),
 (17, 56, 'tengo sueño', 'http://localhost:8000/static/posts/56_5.jpg', '2025-10-12 23:41:42'),
-(18, 58, 'Primera publicación de prueba desde Artenity', 'http://localhost:8000/static/posts/58_4.avif', '2025-10-24 13:59:55');
+(18, 58, 'Primera publicación de prueba desde Artenity', 'http://localhost:8000/static/posts/58_4.avif', '2025-10-24 13:59:55'),
+(19, 57, 'vcvcvcv', NULL, '2025-10-26 20:22:01'),
+(20, 57, 'si', NULL, '2025-10-26 21:40:51'),
+(21, 55, 'hola ahí esperanza', NULL, '2025-10-26 22:14:46');
 
 -- --------------------------------------------------------
 
@@ -865,17 +873,28 @@ INSERT INTO `registro_actividad` (`id_actividad`, `id_usuario`, `accion`, `fecha
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `reportar_usuario`
+-- Estructura de tabla para la tabla `reportes_usuarios`
 --
 
-CREATE TABLE `reportar_usuario` (
+CREATE TABLE `reportes_usuarios` (
   `id_reporte` int(11) NOT NULL,
-  `id_reportante` int(11) DEFAULT NULL,
-  `id_reportado` int(11) DEFAULT NULL,
-  `motivo` text NOT NULL,
-  `fecha_reporte` datetime DEFAULT NULL,
-  `estado` varchar(50) DEFAULT NULL
+  `id_reportante` int(11) NOT NULL,
+  `id_reportado` int(11) NOT NULL,
+  `motivo` varchar(255) NOT NULL,
+  `evidencia_url` varchar(255) DEFAULT NULL,
+  `fecha` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `reportes_usuarios`
+--
+
+INSERT INTO `reportes_usuarios` (`id_reporte`, `id_reportante`, `id_reportado`, `motivo`, `evidencia_url`, `fecha`) VALUES
+(1, 57, 55, 'si', NULL, '2025-10-27 14:41:57'),
+(2, 57, 55, 'CONTENIDO OFENSIVO ', NULL, '2025-10-27 15:22:03'),
+(3, 57, 55, '🚫 Contenido ofensivo o inapropiado (violencia, odio, lenguaje vulgar)', NULL, '2025-10-27 15:22:30'),
+(4, 57, 55, '🚫 Contenido ofensivo o inapropiado (violencia, odio, lenguaje vulgar)', 'http://localhost:8000/static/reportes/reporte_57_55_1761596595.jpg', '2025-10-27 15:23:15'),
+(5, 57, 55, '🖼️ Plagio o uso no autorizado de obras', 'http://localhost:8000/static/reportes/reporte_57_55_1761600922.jpg', '2025-10-27 16:35:22');
 
 -- --------------------------------------------------------
 
@@ -899,11 +918,14 @@ INSERT INTO `seguir_usuario` (`id_seguimiento`, `id_seguidor`, `id_seguido`, `fe
 (6, 1, 57, '2025-10-12 23:20:59'),
 (7, 56, 22, '2025-10-24 12:08:58'),
 (8, 1, 56, '2025-10-24 12:13:00'),
-(12, 57, 58, '2025-10-24 17:10:10'),
 (14, 56, 58, '2025-10-24 17:44:46'),
 (15, 57, 56, '2025-10-24 17:54:01'),
 (16, 58, 57, '2025-10-24 18:11:08'),
-(17, 58, 22, '2025-10-24 18:37:04');
+(17, 58, 22, '2025-10-24 18:37:04'),
+(18, 57, 58, '2025-10-26 20:21:38'),
+(20, 55, 57, '2025-10-26 22:16:21'),
+(21, 57, 55, '2025-10-26 23:11:29'),
+(22, 57, 49, '2025-10-27 18:40:39');
 
 -- --------------------------------------------------------
 
@@ -1169,13 +1191,12 @@ ALTER TABLE `registro_actividad`
   ADD KEY `id_usuario` (`id_usuario`);
 
 --
--- Indices de la tabla `reportar_usuario`
+-- Indices de la tabla `reportes_usuarios`
 --
-ALTER TABLE `reportar_usuario`
+ALTER TABLE `reportes_usuarios`
   ADD PRIMARY KEY (`id_reporte`),
-  ADD KEY `id_reportante` (`id_reportante`),
-  ADD KEY `id_reportado` (`id_reportado`),
-  ADD KEY `ix_reportar_usuario_id_reporte` (`id_reporte`);
+  ADD KEY `fk_reportante` (`id_reportante`),
+  ADD KEY `fk_reportado` (`id_reportado`);
 
 --
 -- Indices de la tabla `seguir_usuario`
@@ -1223,7 +1244,7 @@ ALTER TABLE `amistades`
 -- AUTO_INCREMENT de la tabla `notificaciones`
 --
 ALTER TABLE `notificaciones`
-  MODIFY `id_notificacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
+  MODIFY `id_notificacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
 
 --
 -- AUTO_INCREMENT de la tabla `perfiles`
@@ -1235,19 +1256,19 @@ ALTER TABLE `perfiles`
 -- AUTO_INCREMENT de la tabla `publicaciones`
 --
 ALTER TABLE `publicaciones`
-  MODIFY `id_publicacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id_publicacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
--- AUTO_INCREMENT de la tabla `reportar_usuario`
+-- AUTO_INCREMENT de la tabla `reportes_usuarios`
 --
-ALTER TABLE `reportar_usuario`
-  MODIFY `id_reporte` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `reportes_usuarios`
+  MODIFY `id_reporte` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `seguir_usuario`
 --
 ALTER TABLE `seguir_usuario`
-  MODIFY `id_seguimiento` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id_seguimiento` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT de la tabla `solicitud_de_amistad`
@@ -1285,11 +1306,11 @@ ALTER TABLE `publicaciones`
   ADD CONSTRAINT `publicaciones_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`);
 
 --
--- Filtros para la tabla `reportar_usuario`
+-- Filtros para la tabla `reportes_usuarios`
 --
-ALTER TABLE `reportar_usuario`
-  ADD CONSTRAINT `reportar_usuario_ibfk_1` FOREIGN KEY (`id_reportante`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE,
-  ADD CONSTRAINT `reportar_usuario_ibfk_2` FOREIGN KEY (`id_reportado`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE;
+ALTER TABLE `reportes_usuarios`
+  ADD CONSTRAINT `fk_reportado` FOREIGN KEY (`id_reportado`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_reportante` FOREIGN KEY (`id_reportante`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `seguir_usuario`

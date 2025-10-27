@@ -188,14 +188,22 @@ export async function marcarNotificacionesLeidas() {
 
 
 // ======== REPORTAR USUARIO ========
-export async function reportarUsuario(id_reportado: number, motivo: string) {
+export async function reportarUsuario(id_reportado: number, motivo: string, evidencia?: File) {
   const formData = new FormData();
   formData.append("motivo", motivo);
+  if (evidencia) formData.append("evidencia", evidencia);
+
   const res = await api.post(`/reportar/${id_reportado}`, formData, {
-    headers: { token: getToken(), id_usuario: getUsuarioId() },
+    headers: {
+      token: getToken(),
+      id_usuario: getUsuarioId(),
+      "Content-Type": "multipart/form-data",
+    },
   });
+
   return res.data;
 }
+
 
 // ======== CATEGORÍAS ========
 export async function obtenerCategorias() {

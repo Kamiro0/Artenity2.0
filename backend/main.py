@@ -605,6 +605,53 @@ def obtener_publicaciones_usuario(id_usuario: int, db: Session = Depends(get_db)
         .all()
     return publicaciones
 
+# ------------------ REPORTAR USUARIO ------------------
+@app.post("/reportar/{id_reportado}")
+async def reportar_usuario(
+    id_reportado: int,
+    motivo: str = Form(...),
+    evidencia: UploadFile | None = File(None),
+    db: Session = Depends(get_db),
+    user_id: int = Depends(get_current_user_id)
+):
+    """Permite reportar a otro usuario con un motivo y evidencia opcional."""
+    if id_reportado == user_id:
+        raise HTTPException(status_code=400, detail="No puedes reportarte a ti mismo")
+
+    # Verificar que el usuario reportado exista
+    usuario_reportado = db.query(models.Usuario).filter(models.Usuario.id_usuario == id_reportado).first()
+    if not usuario_reportado:
+        raise HTTPException(status_code=404, detail="Usuario reportado no encontrado")
+
+    # Guardar evidencia si se adjunta
+    evidencia_url = None
+    if evidencia:
+        os.makedirs("static/reportes", exist_ok=True)
+        filename = f"reporte_{user_id}_{id_reportado}_{int(datetime.now().timestamp())}.jpg"
+        path = os.path.join("static/reportes", filename)
+        with open(path, "wb") as f:
+            f.write(await evidencia.read())
+        evidencia_url = f"http://localhost:8000/static/reportes/{filename}"
+
+    # Crear reporte
+    nuevo_reporte = models.ReporteUsuario(
+        id_reportante=user_id,
+        id_reportado=id_reportado,
+        motivo=motivo,
+        evidencia_url=evidencia_url,
+        fecha=datetime.now(),
+    )
+
+    db.add(nuevo_reporte)
+    db.commit()
+    db.refresh(nuevo_reporte)
+
+    return {
+        "mensaje": "Reporte enviado correctamente",
+        "reporte_id": nuevo_reporte.id_reporte,
+        "evidencia": evidencia_url,
+    }
+
 # ------------------ HOME ------------------
 @app.get("/home")
 def home():

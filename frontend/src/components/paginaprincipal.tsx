@@ -36,11 +36,12 @@ const cargarPublicaciones = async () => {
     const posts = await getPublicaciones();
 
     const postsConFotosActualizadas = posts.map((p: any) => {
-      // Si el usuario no tiene perfil o foto, usar imagen por defecto
-      const fotoPerfil =
-        p.usuario?.perfil?.foto_perfil && p.usuario.perfil.foto_perfil.trim() !== ""
-          ? `${p.usuario.perfil.foto_perfil}?t=${new Date().getTime()}`
-          : defaultProfile;
+      let fotoPerfil = defaultProfile;
+
+      // Si hay usuario y perfil con foto válida, úsala
+      if (p.usuario?.perfil?.foto_perfil && p.usuario.perfil.foto_perfil.trim() !== "") {
+        fotoPerfil = `${p.usuario.perfil.foto_perfil}?t=${new Date().getTime()}`;
+      }
 
       return {
         ...p,

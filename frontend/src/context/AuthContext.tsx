@@ -49,7 +49,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           .catch((err) => console.error("Error al cargar perfil:", err));
       }
     }
-  }, []);
+  }, [actualizacion]);
 
   // 🟢 Login
   const login = (newToken: string, newUsuario: Usuario) => {

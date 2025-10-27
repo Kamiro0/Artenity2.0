@@ -55,6 +55,7 @@ export default function PerfilUsuario() {
       setCargando(false);
     }
   };
+   
 
   // 🔹 Cargar amigos
   const cargarAmigos = async (idUsuario: number) => {
@@ -121,17 +122,21 @@ export default function PerfilUsuario() {
     }
   };
 
-  const handleReportar = async () => {
-    if (!id || !motivoReporte.trim()) return;
-    try {
-      await reportarUsuario(parseInt(id), motivoReporte);
-      alert("Usuario reportado correctamente");
-      setReporteModal(false);
-      setMotivoReporte("");
-    } catch (error: any) {
-      alert(error.response?.data?.detail || "Error al reportar usuario");
-    }
-  };
+ // 🔹Reporte Usuario
+ const [evidencia, setEvidencia] = useState<File | null>(null);
+ const [preview, setPreview] = useState<string | null>(null); 
+ const handleReportar = async () => {
+  if (!id || !motivoReporte.trim()) return alert("Debes indicar el motivo del reporte");
+  try {
+    await reportarUsuario(parseInt(id), motivoReporte, evidencia || undefined);
+    alert("Usuario reportado correctamente");
+    setReporteModal(false);
+    setMotivoReporte("");
+    setEvidencia(null);
+  } catch (error: any) {
+    alert(error.response?.data?.detail || "Error al reportar usuario");
+  }
+};
 
   if (cargando) return <div className="cargando">Cargando perfil...</div>;
   if (!perfil) return <div className="error">Usuario no encontrado</div>;
@@ -209,7 +214,7 @@ export default function PerfilUsuario() {
         </div>
       )}
 
-      {/* ✅ Publicaciones del usuario (actualizado con diseño mejorado) */}
+      {/*  Publicaciones del usuario (actualizado con diseño mejorado) */}
       <div className="publicaciones-section">
         <h3>Publicaciones ({publicaciones.length})</h3>
         {publicaciones.length > 0 ? (
@@ -279,30 +284,117 @@ export default function PerfilUsuario() {
       )}
 
       {/* Modal de reporte */}
-      {reporteModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h3>Reportar Usuario</h3>
-            <textarea
-              value={motivoReporte}
-              onChange={(e) => setMotivoReporte(e.target.value)}
-              placeholder="Describe el motivo del reporte..."
-              rows={4}
+{/* 🔹 Modal de Reporte Completo (fusionado y estilizado) */}
+{reporteModal && (
+  <div className="modal-overlay">
+    <div className="modal-reporte">
+      <h2 className="titulo-reporte">⚠️ Reportar Usuario</h2>
+
+      {/* Información del usuario reportado */}
+      <div className="info-usuario-reportado">
+        <img
+          src={perfil.foto_perfil || defaultProfile}
+          alt="Usuario"
+          className="reporte-foto"
+        />
+        <span>@{perfil.usuario?.nombre_usuario}</span>
+      </div>
+
+      {/* Motivos de reporte */}
+      <div className="motivos-reporte">
+        {[
+          "🚫 Contenido ofensivo o inapropiado (violencia, odio, lenguaje vulgar)",
+          "🎭 Suplantación de identidad",
+          "🧠 Acoso o comportamiento abusivo",
+          "🖼️ Plagio o uso no autorizado de obras",
+          "📢 Spam o publicidad no deseada",
+          "🔞 Contenido obsceno o inapropiado",
+        ].map((motivo) => (
+          <label key={motivo}>
+            <input
+              type="radio"
+              value={motivo}
+              checked={motivoReporte === motivo}
+              onClick={() =>
+                setMotivoReporte((prev) => (prev === motivo ? "" : motivo))
+              }
+              readOnly
             />
-            <div className="modal-actions">
-              <button onClick={handleReportar} className="btn-confirmar">
-                Enviar Reporte
-              </button>
-              <button
-                onClick={() => setReporteModal(false)}
-                className="btn-cancelar"
-              >
-                Cancelar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+            {motivo}
+          </label>
+        ))}
+      </div>
+
+      {/* Descripción adicional */}
+      <textarea
+        className="reporte-textarea"
+        placeholder="Describe brevemente lo sucedido (opcional)..."
+        value={
+          ["🚫", "🎭", "🧠", "🖼️", "📢", "🔞"].some((emoji) =>
+            motivoReporte.includes(emoji)
+          )
+            ? ""
+            : motivoReporte
+        }
+        onChange={(e) => setMotivoReporte(e.target.value)}
+      />
+
+      {/* Área de evidencia */}
+      <label className="input-evidencia">
+        {preview ? (
+          <img
+            src={preview}
+            alt="Evidencia subida"
+            className="preview-img-inside"
+          />
+        ) : (
+          <>
+            <img
+              src="/static/icons/upload.png"
+              alt="Subir evidencia"
+              className="icono-upload"
+            />
+            <span>Haz clic o arrastra una imagen aquí</span>
+          </>
+        )}
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => {
+            const file = e.target.files?.[0] || null;
+            setEvidencia(file);
+            if (file) {
+              const reader = new FileReader();
+              reader.onloadend = () => setPreview(reader.result as string);
+              reader.readAsDataURL(file);
+            } else {
+              setPreview(null);
+            }
+          }}
+        />
+      </label>
+
+      {/* Acciones */}
+      <div className="acciones-modal">
+        <button onClick={handleReportar} className="btn-enviar-reporte">
+          Enviar Reporte
+        </button>
+        <button
+          onClick={() => {
+            setReporteModal(false);
+            setMotivoReporte("");
+            setPreview(null);
+            setEvidencia(null);
+          }}
+          className="btn-cancelar-reporte"
+        >
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 }

@@ -25,8 +25,8 @@ class Usuario(Base):
     publicaciones = relationship("Publicacion", back_populates="usuario")
     siguiendo = relationship("SeguirUsuario", foreign_keys="SeguirUsuario.id_seguidor", back_populates="seguidor")
     seguidores = relationship("SeguirUsuario", foreign_keys="SeguirUsuario.id_seguido", back_populates="seguido")
-    reportes_enviados = relationship("ReportarUsuario", foreign_keys="ReportarUsuario.id_reportante", back_populates="reportante")
-    reportes_recibidos = relationship("ReportarUsuario", foreign_keys="ReportarUsuario.id_reportado", back_populates="reportado")
+    reportes_enviados = relationship("ReporteUsuario", foreign_keys="ReporteUsuario.id_reportante", back_populates="reportante")
+    reportes_recibidos = relationship("ReporteUsuario", foreign_keys="ReporteUsuario.id_reportado", back_populates="reportado")
     amistades_enviadas = relationship("SolicitudAmistad", foreign_keys="SolicitudAmistad.id_emisor", back_populates="emisor")
     amistades_recibidas = relationship("SolicitudAmistad", foreign_keys="SolicitudAmistad.id_receptor", back_populates="receptor")
     notificaciones = relationship("Notificacion", back_populates="usuario")
@@ -72,18 +72,20 @@ class SeguirUsuario(Base):
 
 
 # ------------------ REPORTAR USUARIO ------------------
-class ReportarUsuario(Base):
-    __tablename__ = "reportar_usuario"
+class ReporteUsuario(Base):
+    __tablename__ = "reportes_usuarios"
 
     id_reporte = Column(Integer, primary_key=True, index=True)
-    id_reportante = Column(Integer, ForeignKey("usuarios.id_usuario", ondelete="CASCADE"))
-    id_reportado = Column(Integer, ForeignKey("usuarios.id_usuario", ondelete="CASCADE"))
-    motivo = Column(Text, nullable=False)
-    fecha_reporte = Column(DateTime, default=datetime.utcnow)
-    estado = Column(String(50), default="pendiente")  # pendiente / revisado / resuelto
+    id_reportante = Column(Integer, ForeignKey("usuarios.id_usuario"))
+    id_reportado = Column(Integer, ForeignKey("usuarios.id_usuario"))
+    motivo = Column(String, nullable=False)
+    evidencia_url = Column(String, nullable=True)
+    fecha = Column(DateTime, default=datetime.utcnow)
 
+    # 🔹 back_populates para ambas relaciones
     reportante = relationship("Usuario", foreign_keys=[id_reportante], back_populates="reportes_enviados")
     reportado = relationship("Usuario", foreign_keys=[id_reportado], back_populates="reportes_recibidos")
+
 
 
 # ------------------ SOLICITUD DE AMISTAD ------------------

@@ -1,6 +1,6 @@
 /* styles/perfil.css */
 .perfil-container {
-  max-width: 600px;
+  max-width: 6000px;
   margin: 2rem auto;
   padding: 2rem;
   background: rgba(20, 20, 40, 0.9);
@@ -860,4 +860,47 @@ body {
   color: #ccc;
   font-style: italic;
   padding: 40px 0;
+}
+
+/* ===== SCROLL GENERAL PARA LOS CONTENEDORES DE PERFIL ===== */
+.perfil-container,
+.perfil-usuario-container {
+  height: 100vh; /* ocupa toda la pantalla */
+  overflow-y: auto; /* activa el scroll vertical */
+  overflow-x: hidden; /* evita desplazamiento horizontal */
+  scroll-behavior: smooth; /* desplazamiento suave */
+  padding-right: 10px;
+}
+
+/* Ocultar barra fea en algunos navegadores */
+.perfil-container::-webkit-scrollbar,
+.perfil-usuario-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.perfil-container::-webkit-scrollbar-thumb,
+.perfil-usuario-container::-webkit-scrollbar-thumb {
+  background: rgba(150, 100, 255, 0.4);
+  border-radius: 10px;
+}
+
+.perfil-container::-webkit-scrollbar-thumb:hover,
+.perfil-usuario-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(180, 130, 255, 0.7);
+}
+
+/* ===== OPCIONAL: para el modal de reporte ===== */
+.modal-reporte {
+  max-height: 90vh;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.modal-reporte::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-reporte::-webkit-scrollbar-thumb {
+  background: rgba(180, 100, 255, 0.5);
+  border-radius: 8px;
 }
