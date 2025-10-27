@@ -31,29 +31,34 @@ export default function PaginaPrincipal() {
   }, []);
 
   // ✅ Cargar publicaciones
-  const cargarPublicaciones = async () => {
-    try {
-      const posts = await getPublicaciones();
-      // Agregar timestamp a las fotos para evitar caché
-      const postsConFotosActualizadas = posts.map((p: any) => ({
+const cargarPublicaciones = async () => {
+  try {
+    const posts = await getPublicaciones();
+
+    const postsConFotosActualizadas = posts.map((p: any) => {
+      // Si el usuario no tiene perfil o foto, usar imagen por defecto
+      const fotoPerfil =
+        p.usuario?.perfil?.foto_perfil && p.usuario.perfil.foto_perfil.trim() !== ""
+          ? `${p.usuario.perfil.foto_perfil}?t=${new Date().getTime()}`
+          : defaultProfile;
+
+      return {
         ...p,
         usuario: {
           ...p.usuario,
-          perfil: p.usuario?.perfil
-            ? {
-                ...p.usuario.perfil,
-                foto_perfil: p.usuario.perfil.foto_perfil
-                  ? `${p.usuario.perfil.foto_perfil}?t=${new Date().getTime()}`
-                  : defaultProfile,
-              }
-            : null,
+          perfil: {
+            ...p.usuario?.perfil,
+            foto_perfil: fotoPerfil,
+          },
         },
-      }));
-      setPublicaciones(postsConFotosActualizadas);
-    } catch (error) {
-      console.error("Error cargando publicaciones:", error);
-    }
-  };
+      };
+    });
+
+    setPublicaciones(postsConFotosActualizadas);
+  } catch (error) {
+    console.error("Error cargando publicaciones:", error);
+  }
+};
 
   useEffect(() => {
     cargarPublicaciones();
@@ -189,15 +194,15 @@ export default function PaginaPrincipal() {
               {/* Header del post */}
               <div className="post-header">
                 <Link to={`/usuario/${post.usuario?.id_usuario}`}>
-                  <img
+                <img
                     src={
-                      post.usuario?.perfil?.foto_perfil
-                        ? `${post.usuario.perfil.foto_perfil}?t=${new Date().getTime()}`
-                        : defaultProfile
+                   post.usuario?.perfil?.foto_perfil && post.usuario.perfil.foto_perfil.trim() !== ""
+                   ? post.usuario.perfil.foto_perfil
+                    : defaultProfile
                     }
-                    alt="foto de perfil"
-                    className="perfiles perfiles-topbar"
-                  />
+                  alt="foto de perfil"
+                  className="perfiles perfiles-topbar"
+               />
                 </Link>
                 <div className="user-info">
                   <span className="username">
