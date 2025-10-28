@@ -1,18 +1,20 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import {
-  getPerfil,
-  seguirUsuario,
-  enviarSolicitudAmistad,
-  dejarDeSeguirUsuario,
-  reportarUsuario,
-  getAmigos,
-  obtenerEstadisticasPerfil,
-  obtenerPublicacionesUsuario,
-} from "../services/api";
+import { getPerfil, 
+   seguirUsuario, 
+   enviarSolicitudAmistad, 
+   dejarDeSeguirUsuario, 
+   reportarUsuario, 
+   getAmigos, 
+   obtenerEstadisticasPerfil, 
+   obtenerPublicacionesUsuario,
+   obtenerSeguidoresUsuario,
+   obtenerSiguiendoUsuario,
+   } 
+from "../services/api";
 import defaultProfile from "../assets/img/fotoperfildefault.jpg";
 import { useAuth } from "../context/AuthContext";
-import "../styles/perfilUsuario.css";
+import "../styles/perfil.css";
 
 export default function PerfilUsuario() {
   const { id } = useParams();
@@ -28,6 +30,10 @@ export default function PerfilUsuario() {
     publicaciones: 0,
   });
   const [publicaciones, setPublicaciones] = useState<any[]>([]);
+  const [seguidores, setSeguidores] = useState<any[]>([]);
+  const [siguiendo, setSiguiendo] = useState<any[]>([]);
+  const [evidencia, setEvidencia] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
 
   const esAmigo = perfil ? amigos.some((a) => a.id_usuario === perfil.id_usuario) : false;
   const esMiPerfil = usuarioActual?.id_usuario === perfil?.id_usuario;
@@ -39,10 +45,11 @@ export default function PerfilUsuario() {
       cargarAmigos(userId);
       cargarEstadisticas(userId);
       cargarPublicaciones(userId);
+      cargarSeguidores(userId);
+      cargarSiguiendo(userId);
     }
   }, [id]);
 
-  // 🔹 Cargar datos del perfil
   const cargarPerfilUsuario = async (idUsuario: number) => {
     try {
       setCargando(true);
@@ -55,9 +62,7 @@ export default function PerfilUsuario() {
       setCargando(false);
     }
   };
-   
 
-  // 🔹 Cargar amigos
   const cargarAmigos = async (idUsuario: number) => {
     try {
       const amigosData = await getAmigos(idUsuario);
@@ -67,7 +72,6 @@ export default function PerfilUsuario() {
     }
   };
 
-  // 🔹 Cargar estadísticas
   const cargarEstadisticas = async (idUsuario: number) => {
     try {
       const stats = await obtenerEstadisticasPerfil(idUsuario);
@@ -77,7 +81,6 @@ export default function PerfilUsuario() {
     }
   };
 
-  // 🔹 Cargar publicaciones
   const cargarPublicaciones = async (idUsuario: number) => {
     try {
       const posts = await obtenerPublicacionesUsuario(idUsuario);
@@ -87,7 +90,25 @@ export default function PerfilUsuario() {
     }
   };
 
-  // 🔹 Acciones
+  const cargarSeguidores = async (idUsuario: number) => {
+    try {
+      const data = await obtenerSeguidoresUsuario(idUsuario);
+      setSeguidores(data);
+    } catch (error) {
+      console.error("Error cargando seguidores:", error);
+    }
+  };
+
+  const cargarSiguiendo = async (idUsuario: number) => {
+    try {
+      const data = await obtenerSiguiendoUsuario(idUsuario);
+      setSiguiendo(data);
+    } catch (error) {
+      console.error("Error cargando siguiendo:", error);
+    }
+  };
+
+  // --- Acciones ---
   const handleSeguir = async () => {
     if (!id) return;
     try {
@@ -95,6 +116,7 @@ export default function PerfilUsuario() {
       alert("¡Ahora sigues a este usuario!");
       cargarPerfilUsuario(parseInt(id));
       cargarEstadisticas(parseInt(id));
+      cargarSeguidores(parseInt(id));
     } catch (error: any) {
       alert(error.response?.data?.detail || "Error al seguir usuario");
     }
@@ -107,6 +129,7 @@ export default function PerfilUsuario() {
       alert("Has dejado de seguir a este usuario");
       cargarPerfilUsuario(parseInt(id));
       cargarEstadisticas(parseInt(id));
+      cargarSeguidores(parseInt(id));
     } catch (error: any) {
       alert(error.response?.data?.detail || "Error al dejar de seguir usuario");
     }
@@ -122,21 +145,18 @@ export default function PerfilUsuario() {
     }
   };
 
- // 🔹Reporte Usuario
- const [evidencia, setEvidencia] = useState<File | null>(null);
- const [preview, setPreview] = useState<string | null>(null); 
- const handleReportar = async () => {
-  if (!id || !motivoReporte.trim()) return alert("Debes indicar el motivo del reporte");
-  try {
-    await reportarUsuario(parseInt(id), motivoReporte, evidencia || undefined);
-    alert("Usuario reportado correctamente");
-    setReporteModal(false);
-    setMotivoReporte("");
-    setEvidencia(null);
-  } catch (error: any) {
-    alert(error.response?.data?.detail || "Error al reportar usuario");
-  }
-};
+  const handleReportar = async () => {
+    if (!id || !motivoReporte.trim()) return alert("Debes indicar el motivo del reporte");
+    try {
+      await reportarUsuario(parseInt(id), motivoReporte, evidencia || undefined);
+      alert("Usuario reportado correctamente");
+      setReporteModal(false);
+      setMotivoReporte("");
+      setEvidencia(null);
+    } catch (error: any) {
+      alert(error.response?.data?.detail || "Error al reportar usuario");
+    }
+  };
 
   if (cargando) return <div className="cargando">Cargando perfil...</div>;
   if (!perfil) return <div className="error">Usuario no encontrado</div>;
@@ -146,21 +166,15 @@ export default function PerfilUsuario() {
       {/* Header del perfil */}
       <div className="perfil-header">
         <div className="foto-perfil-section">
-          <img
-            src={perfil.foto_perfil || defaultProfile}
-            alt="Foto de perfil"
-            className="foto-perfil-grande"
-          />
+          <img src={perfil.foto_perfil || defaultProfile} alt="Foto de perfil" className="foto-perfil-grande" />
         </div>
-
         <div className="info-perfil">
           <h1>{perfil.usuario?.nombre_usuario || "Usuario"}</h1>
           <p className="nombre-completo">
             {perfil.usuario?.nombre} {perfil.usuario?.apellido}
           </p>
-
           {perfil.descripcion && <p className="descripcion">{perfil.descripcion}</p>}
-
+          
           {/* Estadísticas */}
           <div className="estadisticas">
             <div className="estadistica-item">
@@ -176,8 +190,8 @@ export default function PerfilUsuario() {
               <span className="estadistica-label">Siguiendo</span>
             </div>
           </div>
-
-          {/* Botones de acción */}
+          
+          {/* Botones */}
           {!esMiPerfil && (
             <div className="acciones-perfil">
               {perfil.sigo ? (
@@ -189,15 +203,9 @@ export default function PerfilUsuario() {
                   👣 Seguir
                 </button>
               )}
-
-              <button
-                onClick={handleSolicitudAmistad}
-                className="btn-amistad"
-                disabled={esAmigo}
-              >
+              <button onClick={handleSolicitudAmistad} className="btn-amistad" disabled={esAmigo}>
                 🤝 {esAmigo ? "Ya son amigos" : "Enviar solicitud"}
               </button>
-
               <button onClick={() => setReporteModal(true)} className="btn-reportar">
                 ⚠️ Reportar
               </button>
@@ -214,20 +222,15 @@ export default function PerfilUsuario() {
         </div>
       )}
 
-      {/*  Publicaciones del usuario (actualizado con diseño mejorado) */}
+      {/* Publicaciones */}
       <div className="publicaciones-section">
         <h3>Publicaciones ({publicaciones.length})</h3>
         {publicaciones.length > 0 ? (
           <div className="publicaciones-lista">
             {publicaciones.map((post) => (
               <div key={post.id_publicacion} className="publicacion-card">
-                {/* Header de la publicación */}
                 <div className="publicacion-header">
-                  <img
-                    src={post.usuario?.perfil?.foto_perfil || defaultProfile}
-                    alt="Foto perfil"
-                    className="publicacion-foto-perfil"
-                  />
+                  <img src={post.usuario?.perfil?.foto_perfil || defaultProfile} alt="Foto perfil" className="publicacion-foto-perfil" />
                   <div className="publicacion-info-usuario">
                     <span className="publicacion-usuario">
                       {post.usuario?.nombre_usuario || "Usuario"}
@@ -237,20 +240,12 @@ export default function PerfilUsuario() {
                     </span>
                   </div>
                 </div>
-
-                {/* Contenido de la publicación */}
                 <div className="publicacion-contenido">
                   <p className="publicacion-texto">{post.contenido}</p>
                   {post.imagen && (
-                    <img
-                      src={post.imagen}
-                      alt="Publicación"
-                      className="publicacion-imagen"
-                    />
+                    <img src={post.imagen} alt="Publicación" className="publicacion-imagen" />
                   )}
                 </div>
-
-                {/* Acciones de la publicación */}
                 <div className="publicacion-acciones">
                   <button className="accion-btn">💬 Comentar</button>
                   <button className="accion-btn">🔄 Compartir</button>
@@ -271,11 +266,7 @@ export default function PerfilUsuario() {
           <div className="lista-amigos">
             {amigos.map((amigo) => (
               <div key={amigo.id_usuario} className="amigo-item">
-                <img
-                  src={amigo.foto_perfil || defaultProfile}
-                  alt={amigo.nombre_usuario}
-                  className="foto-amigo"
-                />
+                <img src={amigo.foto_perfil || defaultProfile} alt={amigo.nombre_usuario} className="foto-amigo" />
                 <span>{amigo.nombre_usuario}</span>
               </div>
             ))}
@@ -283,118 +274,122 @@ export default function PerfilUsuario() {
         </div>
       )}
 
-      {/* Modal de reporte */}
-{/* 🔹 Modal de Reporte Completo (fusionado y estilizado) */}
-{reporteModal && (
-  <div className="modal-overlay">
-    <div className="modal-reporte">
-      <h2 className="titulo-reporte">⚠️ Reportar Usuario</h2>
+      {/* 🔹 Seguidores y Siguiendo */}
+      {(seguidores.length > 0 || siguiendo.length > 0) && (
+        <div className="seguidores-siguiendo-section">
+          {seguidores.length > 0 && (
+            <div className="seguidores-section">
+              <h3>Seguidores ({seguidores.length})</h3>
+              <div className="lista-usuarios-mini">
+                {seguidores.map((seg) => (
+                  <div key={seg.id_usuario} className="usuario-item">
+                    <img src={seg.foto_perfil || defaultProfile} alt={seg.nombre_usuario} className="foto-mini" />
+                    <span>@{seg.nombre_usuario}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {siguiendo.length > 0 && (
+            <div className="siguiendo-section">
+              <h3>Siguiendo ({siguiendo.length})</h3>
+              <div className="lista-usuarios-mini">
+                {siguiendo.map((seg) => (
+                  <div key={seg.id_usuario} className="usuario-item">
+                    <img src={seg.foto_perfil || defaultProfile} alt={seg.nombre_usuario} className="foto-mini" />
+                    <span>@{seg.nombre_usuario}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
-      {/* Información del usuario reportado */}
-      <div className="info-usuario-reportado">
-        <img
-          src={perfil.foto_perfil || defaultProfile}
-          alt="Usuario"
-          className="reporte-foto"
-        />
-        <span>@{perfil.usuario?.nombre_usuario}</span>
-      </div>
-
-      {/* Motivos de reporte */}
-      <div className="motivos-reporte">
-        {[
-          "🚫 Contenido ofensivo o inapropiado (violencia, odio, lenguaje vulgar)",
-          "🎭 Suplantación de identidad",
-          "🧠 Acoso o comportamiento abusivo",
-          "🖼️ Plagio o uso no autorizado de obras",
-          "📢 Spam o publicidad no deseada",
-          "🔞 Contenido obsceno o inapropiado",
-        ].map((motivo) => (
-          <label key={motivo}>
-            <input
-              type="radio"
-              value={motivo}
-              checked={motivoReporte === motivo}
-              onClick={() =>
-                setMotivoReporte((prev) => (prev === motivo ? "" : motivo))
+      {/* Modal de Reporte */}
+      {reporteModal && (
+        <div className="modal-overlay">
+          <div className="modal-reporte">
+            <h2 className="titulo-reporte">⚠️ Reportar Usuario</h2>
+            <div className="info-usuario-reportado">
+              <img src={perfil.foto_perfil || defaultProfile} alt="Usuario" className="reporte-foto" />
+              <span>@{perfil.usuario?.nombre_usuario}</span>
+            </div>
+            <div className="motivos-reporte">
+              {[
+                "🚫 Contenido ofensivo o inapropiado (violencia, odio, lenguaje vulgar)",
+                "🎭 Suplantación de identidad",
+                "🧠 Acoso o comportamiento abusivo",
+                "🖼️ Plagio o uso no autorizado de obras",
+                "📢 Spam o publicidad no deseada",
+                "🔞 Contenido obsceno o inapropiado",
+              ].map((motivo) => (
+                <label key={motivo}>
+                  <input 
+                    type="radio" 
+                    value={motivo} 
+                    checked={motivoReporte === motivo}
+                    onClick={() => setMotivoReporte((prev) => (prev === motivo ? "" : motivo))}
+                    readOnly 
+                  />
+                  {motivo}
+                </label>
+              ))}
+            </div>
+            <textarea 
+              className="reporte-textarea" 
+              placeholder="Describe brevemente lo sucedido (opcional)..."
+              value={
+                ["🚫", "🎭", "🧠", "🖼️", "📢", "🔞"].some((emoji) => motivoReporte.includes(emoji))
+                  ? ""
+                  : motivoReporte
               }
-              readOnly
+              onChange={(e) => setMotivoReporte(e.target.value)}
             />
-            {motivo}
-          </label>
-        ))}
-      </div>
-
-      {/* Descripción adicional */}
-      <textarea
-        className="reporte-textarea"
-        placeholder="Describe brevemente lo sucedido (opcional)..."
-        value={
-          ["🚫", "🎭", "🧠", "🖼️", "📢", "🔞"].some((emoji) =>
-            motivoReporte.includes(emoji)
-          )
-            ? ""
-            : motivoReporte
-        }
-        onChange={(e) => setMotivoReporte(e.target.value)}
-      />
-
-      {/* Área de evidencia */}
-      <label className="input-evidencia">
-        {preview ? (
-          <img
-            src={preview}
-            alt="Evidencia subida"
-            className="preview-img-inside"
-          />
-        ) : (
-          <>
-            <img
-              src="/static/icons/upload.png"
-              alt="Subir evidencia"
-              className="icono-upload"
-            />
-            <span>Haz clic o arrastra una imagen aquí</span>
-          </>
-        )}
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => {
-            const file = e.target.files?.[0] || null;
-            setEvidencia(file);
-            if (file) {
-              const reader = new FileReader();
-              reader.onloadend = () => setPreview(reader.result as string);
-              reader.readAsDataURL(file);
-            } else {
-              setPreview(null);
-            }
-          }}
-        />
-      </label>
-
-      {/* Acciones */}
-      <div className="acciones-modal">
-        <button onClick={handleReportar} className="btn-enviar-reporte">
-          Enviar Reporte
-        </button>
-        <button
-          onClick={() => {
-            setReporteModal(false);
-            setMotivoReporte("");
-            setPreview(null);
-            setEvidencia(null);
-          }}
-          className="btn-cancelar-reporte"
-        >
-          Cancelar
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
+            <label className="input-evidencia">
+              {preview ? (
+                <img src={preview} alt="Evidencia subida" className="preview-img-inside" />
+              ) : (
+                <>
+                  <img src="/static/icons/upload.png" alt="Subir evidencia" className="icono-upload" />
+                  <span>Haz clic o arrastra una imagen aquí</span>
+                </>
+              )}
+              <input 
+                type="file" 
+                accept="image/*" 
+                onChange={(e) => {
+                  const file = e.target.files?.[0] || null;
+                  setEvidencia(file);
+                  if (file) {
+                    const reader = new FileReader();
+                    reader.onloadend = () => setPreview(reader.result as string);
+                    reader.readAsDataURL(file);
+                  } else {
+                    setPreview(null);
+                  }
+                }}
+              />
+            </label>
+            <div className="acciones-modal">
+              <button onClick={handleReportar} className="btn-enviar-reporte">
+                Enviar Reporte
+              </button>
+              <button 
+                onClick={() => {
+                  setReporteModal(false);
+                  setMotivoReporte("");
+                  setPreview(null);
+                  setEvidencia(null);
+                }} 
+                className="btn-cancelar-reporte"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

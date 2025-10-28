@@ -11,7 +11,7 @@ import {
   obtenerEstadisticasPerfil,
   obtenerPublicacionesUsuario,
 } from "../services/api";
-import "../styles/perfil.css";
+import "../styles/perfilUsuario.css";
 
 const Perfil: React.FC = () => {
   const { usuario, actualizarFotoPerfil, forzarActualizacionPerfil } = useAuth();

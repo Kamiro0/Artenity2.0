@@ -652,6 +652,54 @@ async def reportar_usuario(
         "evidencia": evidencia_url,
     }
 
+# ------------------ RELACIONES SEGUIR / SEGUIDORES ------------------
+@app.get("/seguidores/{id_usuario}")
+def obtener_seguidores(id_usuario: int, db: Session = Depends(get_db)):
+    seguidores = (
+        db.query(models.SeguirUsuario)
+        .filter(models.SeguirUsuario.id_seguido == id_usuario)
+        .all()
+    )
+
+    resultado = []
+    for seg in seguidores:
+        seguidor = db.query(models.Usuario).filter(models.Usuario.id_usuario == seg.id_seguidor).first()
+        perfil = db.query(models.Perfil).filter(models.Perfil.id_usuario == seg.id_seguidor).first()
+
+        resultado.append({
+            "id_seguimiento": seg.id_seguimiento,
+            "fecha_seguimiento": seg.fecha_seguimiento,
+            "id_seguidor": seg.id_seguidor,
+            "nombre_usuario": seguidor.nombre_usuario if seguidor else "Usuario eliminado",
+            "foto_perfil": perfil.foto_perfil if perfil else None
+        })
+
+    return resultado
+
+
+@app.get("/siguiendo/{id_usuario}")
+def obtener_siguiendo(id_usuario: int, db: Session = Depends(get_db)):
+    siguiendo = (
+        db.query(models.SeguirUsuario)
+        .filter(models.SeguirUsuario.id_seguidor == id_usuario)
+        .all()
+    )
+
+    resultado = []
+    for seg in siguiendo:
+        seguido = db.query(models.Usuario).filter(models.Usuario.id_usuario == seg.id_seguido).first()
+        perfil = db.query(models.Perfil).filter(models.Perfil.id_usuario == seg.id_seguido).first()
+
+        resultado.append({
+            "id_seguimiento": seg.id_seguimiento,
+            "fecha_seguimiento": seg.fecha_seguimiento,
+            "id_seguido": seg.id_seguido,
+            "nombre_usuario": seguido.nombre_usuario if seguido else "Usuario eliminado",
+            "foto_perfil": perfil.foto_perfil if perfil else None
+        })
+
+    return resultado
+
 # ------------------ HOME ------------------
 @app.get("/home")
 def home():

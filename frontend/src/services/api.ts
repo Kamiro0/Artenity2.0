@@ -239,3 +239,16 @@ export async function obtenerPublicacionesUsuario(id_usuario: number) {
   });
   return res.data;
 }
+export async function obtenerSeguidoresUsuario(id_usuario: number) {
+  const res = await api.get(`/seguidores/${id_usuario}`, {
+    headers: { token: getToken(), id_usuario: getUsuarioId() },
+  });
+  return res.data;
+}
+
+export async function obtenerSiguiendoUsuario(id_usuario: number) {
+  const res = await api.get(`/siguiendo/${id_usuario}`, {
+    headers: { token: getToken(), id_usuario: getUsuarioId() },
+  });
+  return res.data;
+}
