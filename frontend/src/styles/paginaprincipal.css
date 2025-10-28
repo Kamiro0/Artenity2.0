@@ -211,17 +211,18 @@ body.pagina-principal {
 
 /* Input búsqueda */
 .search-input {
-  padding: 10px 16px;
-  border-radius: 24px;
-  border: none;
-  outline: none;
-  font-size: 20px;
-  color: #fff;
-  background: linear-gradient(90deg, #9333ea, #ec4899);
-  box-shadow: 0 2px 6px #0006;
-  transition: 0.3s ease;
-  width: 200px;
+  flex: 1;
+  min-width: 300px; 
+  max-width: 500px; 
+  padding: 12px 20px; 
+  border-radius: 25px; 
+  border: 1px solid #999;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 1rem; 
+  transition: border 0.2s, box-shadow 0.2s, width 0.2s; 
 }
+
 .search-input::placeholder {
   color: #ddd;
   font-style: italic;
